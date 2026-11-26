@@ -82,7 +82,7 @@ jobs:
           docker run --rm \
             -v "${{ github.workspace }}:/src:ro" \
             -v "${{ github.workspace }}/out/apk:/out" \
-            openwrt/sdk:x86-64-snapshot \
+            openwrt/sdk:x86-64-25.12.6 \
             sh -c '
               set -e
               mkdir -p package/luci-app-warpscout
