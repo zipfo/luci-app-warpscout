@@ -50,6 +50,7 @@ jobs:
               make package/luci-app-warpscout/compile -j"$(nproc)" V=s
 
               find bin/packages -type f -name "luci-*warpscout*.ipk" -exec cp -v {} /out/ \;
+              export PATH="$PWD/staging_dir/host/bin:$PATH"
               ./scripts/ipkg-make-index.sh /out > /out/Packages
               gzip -k -f /out/Packages
               ls -la /out
@@ -99,6 +100,7 @@ jobs:
               make package/luci-app-warpscout/compile -j"$(nproc)" V=s
 
               find bin/packages -type f -name "luci-*warpscout*.apk" -exec cp -v {} /out/ \;
+              export PATH="$PWD/staging_dir/host/bin:$PATH"
               APK_BIN="$(command -v apk || find staging_dir/host/bin -name apk -type f | head -n 1)"
               "$APK_BIN" mkndx --allow-untrusted --output /out/packages.adb /out/*.apk
               ls -la /out
