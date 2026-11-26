@@ -14,76 +14,81 @@ permissions:
 jobs:
   build-ipk:
     runs-on: ubuntu-latest
-    container:
-      image: openwrt/sdk:x86-64-24.10.0
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          path: src
 
       - name: Build .ipk package and opkg feed index
         run: |
           set -e
-          mkdir -p package/luci-app-warpscout
-          cp -r src/Makefile src/htdocs src/po src/root package/luci-app-warpscout/
-
-          # Update only luci feed to resolve luci.mk and luci-base dependencies
-          ./scripts/feeds update luci
-          ./scripts/feeds install -a -p luci
-
-          make defconfig
-          make package/luci-app-warpscout/compile V=s
-
           mkdir -p out/ipk
-          find bin/packages -type f -name 'luci-*warpscout*.ipk' -exec cp -v {} out/ipk/ \;
+          chmod -R 777 out
 
-          # Generate opkg Packages & Packages.gz index
-          ./scripts/ipkg-make-index.sh out/ipk > out/ipk/Packages
-          gzip -k -f out/ipk/Packages
-          ls -la out/ipk
+          docker run --rm \
+            -v "${{ github.workspace }}:/src:ro" \
+            -v "${{ github.workspace }}/out/ipk:/out" \
+            openwrt/sdk:x86-64-24.10.0 \
+            sh -c '
+              set -e
+              mkdir -p package/luci-app-warpscout
+              cp -r /src/Makefile /src/htdocs /src/po /src/root package/luci-app-warpscout/
+
+              ./scripts/feeds update luci
+              ./scripts/feeds install -a -p luci
+
+              make defconfig
+              make package/luci-app-warpscout/compile V=s
+
+              find bin/packages -type f -name "luci-*warpscout*.ipk" -exec cp -v {} /out/ \;
+              ./scripts/ipkg-make-index.sh /out > /out/Packages
+              gzip -k -f /out/Packages
+              ls -la /out
+            '
 
       - name: Upload .ipk artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ipk-feed
-          path: ${{ github.workspace }}/out/ipk
+          path: out/ipk
 
   build-apk:
     runs-on: ubuntu-latest
-    container:
-      image: openwrt/sdk:x86-64-snapshot
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          path: src
 
       - name: Build .apk package and apk feed index
         run: |
           set -e
-          mkdir -p package/luci-app-warpscout
-          cp -r src/Makefile src/htdocs src/po src/root package/luci-app-warpscout/
-
-          ./scripts/feeds update luci
-          ./scripts/feeds install -a -p luci
-
-          make defconfig
-          make package/luci-app-warpscout/compile V=s
-
           mkdir -p out/apk
-          find bin/packages -type f -name 'luci-*warpscout*.apk' -exec cp -v {} out/apk/ \;
+          chmod -R 777 out
 
-          # Generate apk packages.adb index using SDK host apk tool
-          APK_BIN="$(command -v apk || find staging_dir/host/bin -name apk -type f | head -n 1)"
-          "$APK_BIN" mkndx --allow-untrusted --output out/apk/packages.adb out/apk/*.apk
-          ls -la out/apk
+          docker run --rm \
+            -v "${{ github.workspace }}:/src:ro" \
+            -v "${{ github.workspace }}/out/apk:/out" \
+            openwrt/sdk:x86-64-snapshot \
+            sh -c '
+              set -e
+              mkdir -p package/luci-app-warpscout
+              cp -r /src/Makefile /src/htdocs /src/po /src/root package/luci-app-warpscout/
+
+              ./scripts/feeds update luci
+              ./scripts/feeds install -a -p luci
+
+              make defconfig
+              make package/luci-app-warpscout/compile V=s
+
+              find bin/packages -type f -name "luci-*warpscout*.apk" -exec cp -v {} /out/ \;
+              APK_BIN="$(command -v apk || find staging_dir/host/bin -name apk -type f | head -n 1)"
+              "$APK_BIN" mkndx --allow-untrusted --output /out/packages.adb /out/*.apk
+              ls -la /out
+            '
 
       - name: Upload .apk artifacts
         uses: actions/upload-artifact@v4
         with:
           name: apk-feed
-          path: ${{ github.workspace }}/out/apk
+          path: out/apk
 
   release:
     needs: [build-ipk, build-apk]
