@@ -1,0 +1,18 @@
+#!/bin/sh
+# Initialization script for luci-app-warpscout
+
+mkdir -p /etc/warpscout/artifacts /etc/warpscout/tunnels /var/run/warpscout
+chmod 0700 /etc/warpscout
+chmod 0700 /etc/warpscout/artifacts /etc/warpscout/tunnels
+
+touch /var/log/warpscout.log
+chmod 0644 /var/log/warpscout.log
+
+chmod 0755 /usr/libexec/warpscout/* /etc/init.d/warpscout-socks 2>/dev/null || true
+
+# Synchronize any enabled cron jobs
+if [ -x /usr/libexec/warpscout/cron-sync.sh ]; then
+	/usr/libexec/warpscout/cron-sync.sh || true
+fi
+
+exit 0

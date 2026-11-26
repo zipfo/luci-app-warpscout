@@ -1,0 +1,1268 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-warpscout\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid " (PID: "
+msgstr " (PID: "
+
+msgid " and verifying handshake..."
+msgstr " и проверка рукопожатия..."
+
+msgid " created successfully!"
+msgstr " успешно создан!"
+
+msgid " deleted."
+msgstr " удалён."
+
+msgid " endpoints verified"
+msgstr " адресов проверено"
+
+msgid "# No active WarpScout crontab block found."
+msgstr "# Активный блок WarpScout в crontab не найден."
+
+msgid "(/etc/init.d/cron)"
+msgstr "(/etc/init.d/cron)"
+
+msgid "(Log file is empty)"
+msgstr "(Файл журнала пуст)"
+
+msgid ", PID: "
+msgstr ", PID: "
+
+msgid "/dev/net/tun Device"
+msgstr "Устройство /dev/net/tun"
+
+msgid "0% Loss Only"
+msgstr "Только без потерь (0%)"
+
+msgid "ACTIONS"
+msgstr "ДЕЙСТВИЯ"
+
+msgid "AWG Obfuscation: Jc / Jmin / Jmax"
+msgstr "Обфускация AWG: Jc / Jmin / Jmax"
+
+msgid "Absent (not needed for CLI scan/SOCKS)"
+msgstr "Отсутствует (не требуется для CLI-скана/SOCKS)"
+
+msgid "Account File"
+msgstr "Файл аккаунта"
+
+msgid "Account File Path"
+msgstr "Путь к файлу аккаунта"
+
+msgid "Account Registration & Key Rotation"
+msgstr "Регистрация аккаунта и ротация ключей"
+
+msgid "Account successfully registered: "
+msgstr "Аккаунт успешно зарегистрирован: "
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "Activate background periodic scan via OpenWrt system crontab."
+msgstr "Активировать периодическое фоновое сканирование через системный crontab OpenWrt."
+
+msgid "Active"
+msgstr "Активен"
+
+msgid "Active Target Endpoint:"
+msgstr "Активный целевой endpoint:"
+
+msgid "Allow LAN Access"
+msgstr "Разрешить доступ из LAN"
+
+msgid "AmneziaWG (AWG) Protocol Status: "
+msgstr "Статус протокола AmneziaWG (AWG): "
+
+msgid "AmneziaWG (awg) - Anti-DPI Obfuscation (Recommended)"
+msgstr "AmneziaWG (awg) — обфускация против DPI (рекомендуется)"
+
+msgid "AmneziaWG requires third-party community packages matching your exact kernel vermagic. Recommended repositories:"
+msgstr "Для AmneziaWG требуются сторонние пакеты сообщества под точный vermagic вашего ядра. Рекомендуемые репозитории:"
+
+msgid "Applied best scan endpoint: "
+msgstr "Применён лучший endpoint из сканирования: "
+
+msgid "Applying SOCKS5 Configuration"
+msgstr "Применение конфигурации SOCKS5"
+
+msgid "Are you sure you want to cancel the active scan?"
+msgstr "Вы уверены, что хотите отменить текущее сканирование?"
+
+msgid "Are you sure you want to delete tunnel interface "
+msgstr "Вы уверены, что хотите удалить туннельный интерфейс "
+
+msgid "Are you sure you want to recreate the WARP account? This will generate new keys and register a fresh device identity."
+msgstr "Вы уверены, что хотите пересоздать аккаунт WARP? Будут сгенерированы новые ключи и зарегистрирован новый идентификатор устройства."
+
+msgid "Are you sure you want to truncate /var/log/warpscout.log? This action cannot be undone."
+msgstr "Вы уверены, что хотите очистить /var/log/warpscout.log? Это действие необратимо."
+
+msgid "Assigned IPv4 / IPv6"
+msgstr "Назначенные IPv4 / IPv6"
+
+msgid "Auto-Update automatically reconfigures and re-handshakes all managed WireGuard and AmneziaWG interfaces to the best discovered endpoint."
+msgstr "Автообновление автоматически перенастраивает все управляемые интерфейсы WireGuard и AmneziaWG на лучший найденный endpoint и проверяет рукопожатие."
+
+msgid "Automatically throttled on routers with < 256 MB RAM to prevent OOM."
+msgstr "Автоматически ограничивается на роутерах с < 256 МБ ОЗУ для предотвращения нехватки памяти."
+
+msgid "Available"
+msgstr "Доступно"
+
+msgid "Best: "
+msgstr "Лучший: "
+
+msgid "Binary Path"
+msgstr "Путь к бинарному файлу"
+
+msgid "Binary Status"
+msgstr "Статус бинарного файла"
+
+msgid "Binary path and account file path cannot be empty."
+msgstr "Путь к бинарному файлу и путь к файлу аккаунта не могут быть пустыми."
+
+msgid "Bind to 0.0.0.0 so other computers and phones on your home network can use this SOCKS5 proxy."
+msgstr "Слушать на 0.0.0.0, чтобы другие устройства в локальной сети могли использовать этот SOCKS5-прокси."
+
+msgid "Blocked (Missing components)"
+msgstr "Заблокировано (нет компонентов)"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Cancel Scan"
+msgstr "Отменить сканирование"
+
+msgid "Cancellation signal sent."
+msgstr "Сигнал отмены отправлен."
+
+msgid "Capabilities Cache TTL (seconds)"
+msgstr "Время жизни кэша возможностей (сек.)"
+
+msgid "Capability Matrix"
+msgstr "Матрица возможностей"
+
+msgid "Checking system kernel, packages and protocol handlers..."
+msgstr "Проверка ядра системы, пакетов и обработчиков протоколов..."
+
+msgid "Clear Execution Log"
+msgstr "Очистить журнал выполнения"
+
+msgid "Clear Log"
+msgstr "Очистить журнал"
+
+msgid "Click \"Test SOCKS Proxy\" above to verify port reachability and query Cloudflare trace."
+msgstr "Нажмите «Проверить SOCKS-прокси» выше для проверки доступности порта и запроса трейса Cloudflare."
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Cloudflare WARP Account"
+msgstr "Аккаунт Cloudflare WARP"
+
+msgid "Component Condition"
+msgstr "Состояние компонента"
+
+msgid "Components"
+msgstr "Компоненты"
+
+msgid "Components Missing"
+msgstr "Отсутствуют компоненты"
+
+msgid "Configuration snapshot generated from best discovered endpoint: "
+msgstr "Снимок конфигурации, сгенерированный для лучшего найденного endpoint: "
+
+msgid "Configure automatic periodic endpoint scanning and seamless rotation of managed WireGuard / AmneziaWG tunnels."
+msgstr "Настройка автоматического периодического сканирования и бесшовной ротации управляемых туннелей WireGuard / AmneziaWG."
+
+msgid "Configure core engine paths, inspect runtime logs, and export sanitized system diagnostics without exposing private keys."
+msgstr "Настройка базовых путей, просмотр журналов работы и экспорт обезличенной диагностики без раскрытия приватных ключей."
+
+msgid "Configured"
+msgstr "Настроен"
+
+msgid "Configured Tunnels"
+msgstr "Настроенные туннели"
+
+msgid "Configuring UCI network and firewall, bringing up interface and verifying handshake..."
+msgstr "Настройка UCI network и firewall, поднятие интерфейса и проверка рукопожатия..."
+
+msgid "Connectivity Test Results"
+msgstr "Результаты проверки соединения"
+
+msgid "Contacting Cloudflare API to register WARP account..."
+msgstr "Обращение к Cloudflare API для регистрации аккаунта WARP..."
+
+msgid "Copied to clipboard!"
+msgstr "Скопировано в буфер обмена!"
+
+msgid "Copy IP"
+msgstr "Копировать IP"
+
+msgid "Copy Sanitized Report (JSON)"
+msgstr "Копировать отчёт (JSON)"
+
+msgid "Copy to Clipboard"
+msgstr "Копировать в буфер"
+
+msgid "Core Settings"
+msgstr "Основные настройки"
+
+msgid "Create & Apply Tunnel"
+msgstr "Создать и применить туннель"
+
+msgid "Create AmneziaWG Network Interface"
+msgstr "Создать сетевой интерфейс AmneziaWG"
+
+msgid "Create New Tunnel Interface"
+msgstr "Создать новый туннельный интерфейс"
+
+msgid "Create WireGuard Network Interface"
+msgstr "Создать сетевой интерфейс WireGuard"
+
+msgid "Create and start a new network interface directly from the latest scan discovery configuration."
+msgstr "Создать и запустить новый сетевой интерфейс непосредственно из последней найденной конфигурации."
+
+msgid "Creating Tunnel Interface"
+msgstr "Создание туннельного интерфейса"
+
+msgid "Cron Expression"
+msgstr "Выражение Cron"
+
+msgid "Cron expression cannot be empty."
+msgstr "Выражение cron не может быть пустым."
+
+msgid "Crond Daemon:"
+msgstr "Демон Crond:"
+
+msgid "Current Availability"
+msgstr "Текущая доступность"
+
+msgid "Custom cron expression..."
+msgstr "Пользовательское выражение cron..."
+
+msgid "DOWN"
+msgstr "ОТКЛЮЧЁН"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Device ID"
+msgstr "ID устройства"
+
+msgid "Diagnostic Detail"
+msgstr "Детали диагностики"
+
+msgid "Direct Target IPs (--target)"
+msgstr "Прямые целевые IP (--target)"
+
+msgid "Disabled"
+msgstr "Отключено"
+
+msgid "Discovered Endpoints"
+msgstr "Найденные адреса"
+
+msgid "Download Diagnostics (.json)"
+msgstr "Скачать диагностику (.json)"
+
+msgid "ENDPOINT"
+msgstr "ENDPOINT"
+
+msgid "EXIT / NODE"
+msgstr "ВЫХОД / УЗЕЛ"
+
+msgid "Enable SOCKS5 Proxy"
+msgstr "Включить SOCKS5-прокси"
+
+msgid "Enable Scheduled Scan"
+msgstr "Включить сканирование по расписанию"
+
+msgid "Enabled / Idle"
+msgstr "Включён / Ожидание"
+
+msgid "Endpoint"
+msgstr "Endpoint"
+
+msgid "Endpoint copied: "
+msgstr "Endpoint скопирован: "
+
+msgid "Endpoint updated to "
+msgstr "Endpoint обновлён на "
+
+msgid "Environment snapshot for troubleshooting. Private keys and raw tokens are automatically stripped."
+msgstr "Снимок окружения для диагностики. Приватные ключи и токены автоматически удаляются."
+
+msgid "Error: "
+msgstr "Ошибка: "
+
+msgid "Every 12 hours"
+msgstr "Каждые 12 часов"
+
+msgid "Every 2 hours"
+msgstr "Каждые 2 часа"
+
+msgid "Every 6 hours"
+msgstr "Каждые 6 часов"
+
+msgid "Every minute (Testing only)"
+msgstr "Каждую минуту (только для тестов)"
+
+msgid "Every night at 04:00 (Recommended)"
+msgstr "Каждую ночь в 04:00 (рекомендуется)"
+
+msgid "Exclude Edge Nodes (--exclude-node)"
+msgstr "Исключить узлы (--exclude-node)"
+
+msgid "Executable /usr/bin/awg not found"
+msgstr "Исполняемый файл /usr/bin/awg не найден"
+
+msgid "Executable /usr/bin/wg not found"
+msgstr "Исполняемый файл /usr/bin/wg не найден"
+
+msgid "Execution Log (/var/log/warpscout.log)"
+msgstr "Журнал выполнения (/var/log/warpscout.log)"
+
+msgid "Exit: "
+msgstr "Код выхода: "
+
+msgid "Export to CSV"
+msgstr "Экспорт в CSV"
+
+msgid "Failed"
+msgstr "Ошибка"
+
+msgid "Failed to clear log file."
+msgstr "Не удалось очистить файл журнала."
+
+msgid "Failed to copy to clipboard"
+msgstr "Не удалось скопировать в буфер обмена"
+
+msgid "Failed to create tunnel: "
+msgstr "Не удалось создать туннель: "
+
+msgid "Failed to delete tunnel: "
+msgstr "Не удалось удалить туннель: "
+
+msgid "Failed to save schedule."
+msgstr "Не удалось сохранить расписание."
+
+msgid "Failed to save settings."
+msgstr "Не удалось сохранить настройки."
+
+msgid "Failed to start scan: "
+msgstr "Не удалось запустить сканирование: "
+
+msgid "Failed to start test job: "
+msgstr "Не удалось запустить тестовую задачу: "
+
+msgid "Failed to update SOCKS configuration."
+msgstr "Не удалось обновить конфигурацию SOCKS."
+
+msgid "Filter Country"
+msgstr "Фильтр по стране"
+
+msgid "Filter Node / City"
+msgstr "Фильтр по узлу / городу"
+
+msgid "Firewall Zone"
+msgstr "Зона межсетевого экрана"
+
+msgid "Found best endpoint: "
+msgstr "Найден лучший endpoint: "
+
+msgid "Frequency Preset"
+msgstr "Пресет частоты"
+
+msgid "Generated WireGuard / AmneziaWG Configuration"
+msgstr "Сгенерированная конфигурация WireGuard / AmneziaWG"
+
+msgid "Go to Scanner"
+msgstr "Перейти к сканеру"
+
+msgid "HOST PING"
+msgstr "PING ХОСТА"
+
+msgid "Handler missing"
+msgstr "Обработчик отсутствует"
+
+msgid "Handshake"
+msgstr "Рукопожатие"
+
+msgid "Handshake established."
+msgstr "Рукопожатие установлено."
+
+msgid "Handshake verified with endpoint: "
+msgstr "Рукопожатие подтверждено с endpoint: "
+
+msgid "Important Usage Notes"
+msgstr "Важные примечания"
+
+msgid "In-Tunnel Ping & Loss (-P)"
+msgstr "Пинг и потери внутри туннеля (-P)"
+
+msgid "In-tunnel Ping & Loss (-P)"
+msgstr "Пинг и потери внутри туннеля (-P)"
+
+msgid "Incomplete Components"
+msgstr "Неполные компоненты"
+
+msgid "Initializing scan process..."
+msgstr "Инициализация процесса сканирования..."
+
+msgid "Inspect discovered endpoints with real in-tunnel round-trip times and packet loss. Copy endpoints or export configurations directly into network tunnels."
+msgstr "Просмотр найденных адресов с реальной задержкой внутри туннеля и потерями пакетов. Копирование адресов или экспорт в сетевые туннели."
+
+msgid "Install Binary"
+msgstr "Установить бинарник"
+
+msgid "Installation instruction: "
+msgstr "Инструкция по установке: "
+
+msgid "Installation instructions (Third-Party Community Feeds):"
+msgstr "Инструкции по установке (сторонние репозитории сообщества):"
+
+msgid "Installed"
+msgstr "Установлен"
+
+msgid "Installed in package database"
+msgstr "Установлен в базе пакетов"
+
+msgid "Interface"
+msgstr "Интерфейс"
+
+msgid "Interface MTU"
+msgstr "MTU интерфейса"
+
+msgid "Interface Name (max 15 chars)"
+msgstr "Имя интерфейса (макс. 15 символов)"
+
+msgid "Interface name must be 1 to 15 alphanumeric characters."
+msgstr "Имя интерфейса должно содержать от 1 до 15 буквенно-цифровых символов."
+
+msgid "Introduces a random sleep (0 to N seconds) before scanning to avoid synchronized load spikes and network congestion."
+msgstr "Добавляет случайную задержку (от 0 до N сек.) перед сканированием для исключения пиковых нагрузок."
+
+msgid "Job ID: "
+msgstr "ID задачи: "
+
+msgid "Kernel Compatibility (vermagic)"
+msgstr "Совместимость с ядром (vermagic)"
+
+msgid "Kernel Module (kmod-amneziawg)"
+msgstr "Модуль ядра (kmod-amneziawg)"
+
+msgid "Kernel Module (kmod-wireguard)"
+msgstr "Модуль ядра (kmod-wireguard)"
+
+msgid "Kernel Version"
+msgstr "Версия ядра"
+
+msgid "Kernel: "
+msgstr "Ядро: "
+
+msgid "LOCATION"
+msgstr "ЛОКАЦИЯ"
+
+msgid "LOSS"
+msgstr "ПОТЕРИ"
+
+msgid "Last 100 lines"
+msgstr "Последние 100 строк"
+
+msgid "Last 200 lines"
+msgstr "Последние 200 строк"
+
+msgid "Last 500 lines"
+msgstr "Последние 500 строк"
+
+msgid "Last Execution:"
+msgstr "Последний запуск:"
+
+msgid "Last scan completed successfully! "
+msgstr "Последнее сканирование успешно завершено! "
+
+msgid "Last scan failed (exit code "
+msgstr "Последнее сканирование завершилось ошибкой (код "
+
+msgid "Latest Scan Summary"
+msgstr "Сводка последнего сканирования"
+
+msgid "Launch Parameters"
+msgstr "Параметры запуска"
+
+msgid "Launch warpscout socks proxy in background via procd."
+msgstr "Запускать прокси warpscout socks в фоне через procd."
+
+msgid "Launching Scanner"
+msgstr "Запуск сканера"
+
+msgid "Listen Port"
+msgstr "Порт прослушивания"
+
+msgid "Live Scanner Output:"
+msgstr "Вывод сканера в реальном времени:"
+
+msgid "Loading Generated Tunnel Config"
+msgstr "Загрузка сгенерированной конфигурации туннеля"
+
+msgid "Log file cleared."
+msgstr "Файл журнала очищен."
+
+msgid "MASQUE (HTTP/3 and HTTP/2) is supported by warpscout for endpoint probing, SNI scanning, SOCKS5 proxy mode, and exporting usque native JSON configs."
+msgstr "MASQUE (HTTP/3 и HTTP/2) поддерживается warpscout для проверки адресов, сканирования SNI, режима SOCKS5-прокси и экспорта JSON-конфигов usque."
+
+msgid "MASQUE (masque) - CONNECT-IP over QUIC"
+msgstr "MASQUE (masque) — CONNECT-IP поверх QUIC"
+
+msgid "MASQUE Protocol Status: "
+msgstr "Статус протокола MASQUE: "
+
+msgid "MASQUE-H2 (masque-h2) - CONNECT-IP over HTTP/2 TCP"
+msgstr "MASQUE-H2 (masque-h2) — CONNECT-IP поверх HTTP/2 TCP"
+
+msgid "Make Tunnel"
+msgstr "Создать туннель"
+
+msgid "Manage permanent in-kernel network tunnel interfaces created from discovered Cloudflare WARP endpoints."
+msgstr "Управление постоянными сетевыми интерфейсами туннелей в ядре на базе найденных адресов Cloudflare WARP."
+
+msgid "Max Parallel Tunnel Jobs (-jt)"
+msgstr "Макс. параллельных потоков (-jt)"
+
+msgid "Maximum Jitter Delay (seconds)"
+msgstr "Максимальная задержка джиттера (сек.)"
+
+msgid "Measure Download Speed (--speed)"
+msgstr "Измерять скорость загрузки (--speed)"
+
+msgid "Measuring download speed across all subnets takes significant time (several minutes). Continue?"
+msgstr "Измерение скорости загрузки по всем подсетям занимает значительное время (несколько минут). Продолжить?"
+
+msgid "Missing"
+msgstr "Отсутствует"
+
+msgid "Missing / Incomplete"
+msgstr "Отсутствует / неполный"
+
+msgid "Module missing"
+msgstr "Модуль отсутствует"
+
+msgid "Never"
+msgstr "Никогда"
+
+msgid "No WARP scan has been executed yet, or previous scans did not discover working endpoints. Run a scan from the Scanner view to discover optimal endpoints."
+msgstr "Сканирование WARP ещё не выполнялось, либо рабочие адреса не найдены. Запустите сканирование во вкладке «Сканирование»."
+
+msgid "No WireGuard or AmneziaWG interfaces configured yet."
+msgstr "Интерфейсы WireGuard или AmneziaWG ещё не настроены."
+
+msgid "No configuration file found."
+msgstr "Файл конфигурации не найден."
+
+msgid "No data to export"
+msgstr "Нет данных для экспорта"
+
+msgid "No discovery scan results available"
+msgstr "Нет доступных результатов сканирования"
+
+msgid "No endpoints match the selected filters."
+msgstr "Нет адресов, соответствующих выбранным фильтрам."
+
+msgid "No error details captured in stderr."
+msgstr "Детали ошибки в stderr не зафиксированы."
+
+msgid "No optimal endpoint available from last scan. Run a scan first."
+msgstr "Нет оптимального адреса из последнего сканирования. Сначала выполните сканирование."
+
+msgid "No previous job record"
+msgstr "Нет записей о предыдущих запусках"
+
+msgid "No scan performed yet"
+msgstr "Сканирование ещё не выполнялось"
+
+msgid "No vermagic detected"
+msgstr "vermagic не обнаружен"
+
+msgid "Node: "
+msgstr "Узел: "
+
+msgid "None configured"
+msgstr "Не настроено"
+
+msgid "Not found"
+msgstr "Не найден"
+
+msgid "Not installed"
+msgstr "Не установлен"
+
+msgid "Notice: Handshake pending."
+msgstr "Примечание: ожидание рукопожатия."
+
+msgid "Notice: Interface created, but initial handshake was not received within 15 seconds."
+msgstr "Примечание: интерфейс создан, но начальное рукопожатие не получено в течение 15 секунд."
+
+msgid "Notice: Users are responsible for selecting compatible kmod packages for their firmware build."
+msgstr "Примечание: пользователь несёт ответственность за выбор совместимых пакетов kmod для своей сборки прошивки."
+
+msgid "OK"
+msgstr "ОК"
+
+msgid "OpenWrt LuCI management wrapper for warpscout CLI utility. Supports WireGuard, AmneziaWG, and MASQUE protocols."
+msgstr "Веб-интерфейс LuCI для CLI-утилиты warpscout. Поддерживает протоколы WireGuard, AmneziaWG и MASQUE."
+
+msgid "OpenWrt Release / Target"
+msgstr "Релиз OpenWrt / Платформа"
+
+msgid "Operation"
+msgstr "Операция"
+
+msgid "Optimal Discovered Endpoint"
+msgstr "Оптимальный найденный endpoint"
+
+msgid "Overview"
+msgstr "Обзор"
+
+msgid "Package Manager: "
+msgstr "Пакетный менеджер: "
+
+msgid "Package not installed"
+msgstr "Пакет не установлен"
+
+msgid "Permanent in-kernel network interfaces for MASQUE are currently not available in OpenWrt netifd."
+msgstr "Постоянные сетевые интерфейсы ядра для MASQUE в настоящее время недоступны в OpenWrt netifd."
+
+msgid "Please specify a target WARP endpoint before enabling the SOCKS proxy."
+msgstr "Пожалуйста, укажите целевой endpoint WARP перед включением SOCKS-прокси."
+
+msgid "Port Closed"
+msgstr "Порт закрыт"
+
+msgid "Port Open (Listening)"
+msgstr "Порт открыт (слушает)"
+
+msgid "Port number the proxy server listens on (default: 1080)."
+msgstr "Номер порта прокси-сервера (по умолчанию: 1080)."
+
+msgid "Port unreachable"
+msgstr "Порт недоступен"
+
+msgid "Present"
+msgstr "Присутствует"
+
+msgid "Private Key Mask"
+msgstr "Маска приватного ключа"
+
+msgid "Probe Timeout seconds (-t)"
+msgstr "Таймаут проверки, сек. (-t)"
+
+msgid "Probing proxy reachability and Cloudflare CDN trace..."
+msgstr "Проверка доступности прокси и запрос трейса Cloudflare CDN..."
+
+msgid "Profile defining scan protocol (AWG/WG), sample size, in-tunnel ping, and node exclusions."
+msgstr "Профиль, определяющий протокол (AWG/WG), размер выборки, пинг внутри туннеля и исключения узлов."
+
+msgid "Protocol"
+msgstr "Протокол"
+
+msgid "Protocol (-p)"
+msgstr "Протокол (-p)"
+
+msgid "Protocol Capabilities"
+msgstr "Возможности протоколов"
+
+msgid "Protocol Utility (awg)"
+msgstr "Утилита протокола (awg)"
+
+msgid "Protocol Utility (wg)"
+msgstr "Утилита протокола (wg)"
+
+msgid "Protocol used by userspace proxy to connect to Cloudflare edge."
+msgstr "Протокол, используемый userspace-прокси для подключения к узлам Cloudflare."
+
+msgid "Provides signed repository feeds for OpenWrt 25.x (apk). Repository: https://github.com/Slava-Shchipunov/awg-openwrt"
+msgstr "Предоставляет подписанные репозитории для OpenWrt 25.x (apk). Репозиторий: https://github.com/Slava-Shchipunov/awg-openwrt"
+
+msgid "Proxy Configuration"
+msgstr "Настройка прокси"
+
+msgid "Proxy Service Status"
+msgstr "Статус службы прокси"
+
+msgid "Proxy is responding! Connection verified."
+msgstr "Прокси отвечает! Соединение подтверждено."
+
+msgid "Quick Status"
+msgstr "Краткий статус"
+
+msgid "RPC error: "
+msgstr "Ошибка RPC: "
+
+msgid "Reading generated configuration from artifacts..."
+msgstr "Чтение сгенерированной конфигурации из артефактов..."
+
+msgid "Ready"
+msgstr "Готово"
+
+msgid "Ready for Interface Creation"
+msgstr "Готов к созданию интерфейса"
+
+msgid "Recreate Account (--fresh)"
+msgstr "Пересоздать аккаунт (--fresh)"
+
+msgid "Recreating Account"
+msgstr "Пересоздание аккаунта"
+
+msgid "Refresh Capabilities (Check Again)"
+msgstr "Обновить возможности (проверить заново)"
+
+msgid "Refresh Log"
+msgstr "Обновить журнал"
+
+msgid "Refreshing Capabilities"
+msgstr "Обновление возможностей"
+
+msgid "Register Account"
+msgstr "Зарегистрировать аккаунт"
+
+msgid "Registering Account"
+msgstr "Регистрация аккаунта"
+
+msgid "Registration failed: "
+msgstr "Ошибка регистрации: "
+
+msgid "Required Component"
+msgstr "Требуемый компонент"
+
+msgid "Results"
+msgstr "Результаты"
+
+msgid "Route Allowed IPs (Default Route)"
+msgstr "Маршрутизировать Allowed IPs (маршрут по умолчанию)"
+
+msgid "Run New Scan"
+msgstr "Запустить новое сканирование"
+
+msgid "Run Scheduled Job Now (Test)"
+msgstr "Запустить задачу сейчас (тест)"
+
+msgid "Run a standalone userspace SOCKS5 proxy to test WARP endpoints without requiring root privileges or kernel WireGuard/AmneziaWG modules."
+msgstr "Запуск автономного userspace SOCKS5-прокси для тестирования адресов WARP без прав root и без модулей ядра WireGuard/AmneziaWG."
+
+msgid "Run asynchronous discovery scans across Cloudflare WARP IP ranges and evaluate endpoint latency, packet loss, and throughput."
+msgstr "Асинхронное сканирование диапазонов Cloudflare WARP с оценкой задержки, потерь пакетов и пропускной способности."
+
+msgid "Running"
+msgstr "Запущен"
+
+msgid "Running on port "
+msgstr "Работает на порту "
+
+msgid "Running..."
+msgstr "Выполняется..."
+
+msgid "SOCKS Proxy"
+msgstr "SOCKS-прокси"
+
+msgid "SOCKS Proxy: "
+msgstr "SOCKS-прокси: "
+
+msgid "SOCKS proxy configuration updated successfully."
+msgstr "Конфигурация SOCKS-прокси успешно обновлена."
+
+msgid "Samples per subnet (-n)"
+msgstr "Выборка на подсеть (-n)"
+
+msgid "Sanitized diagnostics JSON copied to clipboard."
+msgstr "Обезличенный JSON-отчёт диагностики скопирован в буфер обмена."
+
+msgid "Save & Apply Schedule"
+msgstr "Сохранить и применить расписание"
+
+msgid "Save & Apply Settings"
+msgstr "Сохранить и применить настройки"
+
+msgid "Save Settings"
+msgstr "Сохранить настройки"
+
+msgid "Saving Schedule"
+msgstr "Сохранение расписания"
+
+msgid "Saving Settings"
+msgstr "Сохранение настроек"
+
+msgid "Saving job parameters and launching scan runner..."
+msgstr "Сохранение параметров задачи и запуск сканера..."
+
+msgid "Scan"
+msgstr "Сканирование"
+
+msgid "Scan & Auto-Update Managed Tunnels (Recommended)"
+msgstr "Сканировать и автообновлять управляемые туннели (рекомендуется)"
+
+msgid "Scan & SOCKS Only"
+msgstr "Только скан и SOCKS"
+
+msgid "Scan Job ID / Time"
+msgstr "ID задачи / время"
+
+msgid "Scan Only (Save results and configuration without rotating tunnels)"
+msgstr "Только сканировать (сохранить результаты без ротации туннелей)"
+
+msgid "Scan Profile"
+msgstr "Профиль сканирования"
+
+msgid "Scan WG / AWG / MASQUE endpoints"
+msgstr "Сканировать адреса WG / AWG / MASQUE"
+
+msgid "Scan in progress"
+msgstr "Выполняется сканирование"
+
+msgid "Scan is running (Job ID: "
+msgstr "Сканирование запущено (ID: "
+
+msgid "Scan: "
+msgstr "Скан: "
+
+msgid "Schedule"
+msgstr "Расписание"
+
+msgid "Schedule Configuration"
+msgstr "Настройка расписания"
+
+msgid "Schedule saved and crontab synchronized successfully."
+msgstr "Расписание сохранено, crontab успешно синхронизирован."
+
+msgid "Scheduled Action"
+msgstr "Действие по расписанию"
+
+msgid "Scheduled Task:"
+msgstr "Запланированная задача:"
+
+msgid "Scheduled job launched in background. Check the Scan or Results tab for real-time progress."
+msgstr "Задача запущена в фоне. Отслеживайте прогресс на вкладке «Сканирование» или «Результаты»."
+
+msgid "Scheduler Status"
+msgstr "Статус планировщика"
+
+msgid "Select a predefined schedule interval or choose custom."
+msgstr "Выберите готовый интервал или укажите собственный."
+
+msgid "Service State:"
+msgstr "Состояние службы:"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Settings saved successfully."
+msgstr "Настройки успешно сохранены."
+
+msgid "Socket Status:"
+msgstr "Статус сокета:"
+
+msgid "Sort: Lowest Host Ping"
+msgstr "Сортировка: мин. пинг хоста"
+
+msgid "Sort: Lowest Loss"
+msgstr "Сортировка: мин. потери"
+
+msgid "Sort: Lowest Tun Ping"
+msgstr "Сортировка: мин. пинг туннеля"
+
+msgid "Sort: Node Code"
+msgstr "Сортировка: код узла"
+
+msgid "Standard 5-field cron format: minute (0-59), hour (0-23), day of month (1-31), month (1-12), day of week (0-7)."
+msgstr "Стандартный 5-польный формат cron: минута (0-59), час (0-23), день месяца (1-31), месяц (1-12), день недели (0-7)."
+
+msgid "Start Scan"
+msgstr "Начать сканирование"
+
+msgid "Starting warpscout background scan process..."
+msgstr "Запуск фонового процесса сканирования warpscout..."
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Stopped (Error)"
+msgstr "Остановлен (ошибка)"
+
+msgid "Stored with 0600 permissions. Private keys are never exposed via RPC."
+msgstr "Хранится с правами 0600. Приватные ключи никогда не передаются по RPC."
+
+msgid "Success"
+msgstr "Успешно"
+
+msgid "Supports both OpenWrt 24.10 (opkg) and 25.x (apk). Repository: https://github.com/2Grey/awg-openwrt"
+msgstr "Поддерживает OpenWrt 24.10 (opkg) и 25.x (apk). Репозиторий: https://github.com/2Grey/awg-openwrt"
+
+msgid "System & Protocol Capabilities"
+msgstr "Системные возможности и протоколы"
+
+msgid "System Crontab Status (/etc/crontabs/root)"
+msgstr "Статус системного Crontab (/etc/crontabs/root)"
+
+msgid "System Diagnostics"
+msgstr "Системная диагностика"
+
+msgid "System: "
+msgstr "Система: "
+
+msgid "TUN PING"
+msgstr "PING ТУННЕЛЯ"
+
+msgid "Target Cloudflare WARP IP:port. You can enter an endpoint manually or click the button above to copy the best endpoint from your latest scan."
+msgstr "Целевой IP:порт Cloudflare WARP. Введите адрес вручную или нажмите кнопку выше, чтобы подставить лучший адрес из последнего сканирования."
+
+msgid "Target Specific Nodes (--node)"
+msgstr "Целевые узлы (--node)"
+
+msgid "Target WARP Endpoint"
+msgstr "Целевой endpoint WARP"
+
+msgid "Test SOCKS Proxy"
+msgstr "Проверить SOCKS-прокси"
+
+msgid "Test failed: "
+msgstr "Ошибка проверки: "
+
+msgid "This will remove it from network and firewall configuration."
+msgstr "Интерфейс будет удалён из конфигурации network и firewall."
+
+msgid "Transfer (Rx / Tx)"
+msgstr "Трафик (Rx / Tx)"
+
+msgid "Triggering Test Run"
+msgstr "Запуск тестового прогона"
+
+msgid "Tunnel "
+msgstr "Туннель "
+
+msgid "Tunnel Protocol"
+msgstr "Протокол туннеля"
+
+msgid "Tunnel configuration copied to clipboard!"
+msgstr "Конфигурация туннеля скопирована в буфер обмена!"
+
+msgid "Tunnels"
+msgstr "Туннели"
+
+msgid "UP"
+msgstr "АКТИВЕН"
+
+msgid "Unknown error"
+msgstr "Неизвестная ошибка"
+
+msgid "Update Endpoint"
+msgstr "Обновить endpoint"
+
+msgid "Update failed: "
+msgstr "Ошибка обновления: "
+
+msgid "Updating Tunnel Endpoint"
+msgstr "Обновление endpoint туннеля"
+
+msgid "Updating UCI configuration and synchronizing system crontab..."
+msgstr "Обновление конфигурации UCI и синхронизация системного crontab..."
+
+msgid "Updating UCI settings and controlling warpscout-socks service..."
+msgstr "Обновление настроек UCI и управление службой warpscout-socks..."
+
+msgid "Updating WarpScout UCI configuration..."
+msgstr "Обновление конфигурации WarpScout в UCI..."
+
+msgid "Updating endpoint to "
+msgstr "Обновление endpoint на "
+
+msgid "Use Best Scan Endpoint ("
+msgstr "Использовать лучший endpoint ("
+
+msgid "View / Copy Generated Config (.conf)"
+msgstr "Просмотр / копирование конфигурации (.conf)"
+
+msgid "View Raw Diagnostics JSON & Storage/Syslog Details"
+msgstr "Показать полный JSON диагностики, диски и syslog"
+
+msgid "View Results Table"
+msgstr "Таблица результатов"
+
+msgid "View: All Endpoints"
+msgstr "Вид: все адреса"
+
+msgid "View: Best per Node only"
+msgstr "Вид: только лучший на узел"
+
+msgid "Waiting for runner output..."
+msgstr "Ожидание вывода раннера..."
+
+msgid "Warning: Allowing LAN access binds SOCKS to 0.0.0.0 without authentication. Any device on your local network will be able to route traffic through this router."
+msgstr "Предупреждение: разрешение доступа из LAN привязывает SOCKS к 0.0.0.0 без аутентификации. Любое устройство в локальной сети сможет направлять трафик через этот роутер."
+
+msgid "WarpScout"
+msgstr "WarpScout"
+
+msgid "WarpScout - Cloudflare WARP Scanner & Manager"
+msgstr "WarpScout — сканер и менеджер Cloudflare WARP"
+
+msgid "WarpScout - Discovery Results"
+msgstr "WarpScout — результаты сканирования"
+
+msgid "WarpScout - Endpoint Discovery Results"
+msgstr "WarpScout — результаты поиска адресов"
+
+msgid "WarpScout - Scanner Runner"
+msgstr "WarpScout — запуск сканирования"
+
+msgid "WarpScout - WireGuard & AmneziaWG Tunnels"
+msgstr "WarpScout — туннели WireGuard и AmneziaWG"
+
+msgid "WarpScout Binary"
+msgstr "Бинарный файл WarpScout"
+
+msgid "WarpScout Binary Path"
+msgstr "Путь к бинарному файлу WarpScout"
+
+msgid "WarpScout SOCKS5 Proxy"
+msgstr "WarpScout — SOCKS5-прокси"
+
+msgid "WarpScout Scheduler"
+msgstr "WarpScout — планировщик"
+
+msgid "WarpScout Settings & Diagnostics"
+msgstr "WarpScout — настройки и диагностика"
+
+msgid "WarpScout manages its own isolated block inside root crontab. Any custom user cron jobs are preserved untouched."
+msgstr "WarpScout управляет изолированным блоком в root crontab. Пользовательские задачи cron остаются нетронутыми."
+
+msgid "WarpScout scans Cloudflare WARP endpoints in pure userspace without requiring kernel modules. However, activating permanent in-kernel tunnels requires the respective kernel module, userspace tool, and netifd protocol handler."
+msgstr "WarpScout сканирует адреса Cloudflare WARP полностью в userspace без модулей ядра. Однако для создания постоянных туннелей в ядре требуются соответствующий модуль ядра, утилита и обработчик netifd."
+
+msgid "WireGuard (wg) - Standard UDP"
+msgstr "WireGuard (wg) — стандартный UDP"
+
+msgid "WireGuard Protocol Status: "
+msgstr "Статус протокола WireGuard: "
+
+msgid "WireGuard is an official OpenWrt package. You can install it via SSH:"
+msgstr "WireGuard — официальный пакет OpenWrt. Вы можете установить его по SSH:"
+
+msgid "Working Endpoints"
+msgstr "Рабочие адреса"
+
+msgid "Zone"
+msgstr "Зона"
+
+msgid "ago"
+msgstr "назад"
+
+msgid "netifd Handler"
+msgstr "Обработчик netifd"
+
+msgid "warpscout binary only"
+msgstr "только бинарник warpscout"
+
+msgid "warpscout binary only (pure userspace)"
+msgstr "только бинарник warpscout (pure userspace)"
+
+msgid "• No Failover: Unlike UCI network interfaces, if ISP or DPI interrupts this single UDP socket, the proxy will not automatically switch endpoints. For permanent router routing, use the Tunnels tab."
+msgstr "• Без автопереключения: в отличие от сетевых интерфейсов UCI, при блокировке этого UDP-сокета провайдером или DPI прокси не переключится на другой адрес. Для постоянной маршрутизации используйте вкладку «Туннели»."
+
+msgid "• Single Tunnel Testing: Designed for quick endpoint testing, curl probes, and browser exploration without routing whole-router traffic."
+msgstr "• Тестирование одного туннеля: предназначен для быстрой проверки адресов через curl или браузер без заворачивания всего трафика роутера."
+
+msgid "• Standalone Userspace Engine: warpscout socks does not require Linux kernel modules (kmod-wireguard / kmod-amneziawg) or /dev/net/tun."
+msgstr "• Автономный userspace-движок: warpscout socks не требует модулей ядра Linux (kmod-wireguard / kmod-amneziawg) и /dev/net/tun."
+
+msgid "AWG Custom I1 Packet (--i1)"
+msgstr "Пользовательский пакет I1 AWG (--i1)"
+
+msgid "AWG Generate I1 (--gen-i1 / --i1-sni)"
+msgstr "Генерация I1 AWG (--gen-i1 / --i1-sni)"
+
+msgid "AWG Randomize Junk (--gen-junk)"
+msgstr "Случайные junk-пакеты AWG (--gen-junk)"
+
+msgid "Are you sure you want to delete scan profile "
+msgstr "Вы уверены, что хотите удалить профиль сканирования "
+
+msgid "Best Endpoint Criterion (--best-by)"
+msgstr "Критерий лучшего адреса (--best-by)"
+
+msgid "Built-in iCloud probe"
+msgstr "Встроенная проба iCloud"
+
+msgid "Custom Port / Port Sweep (--port / --sweep-ports)"
+msgstr "Свой порт / перебор портов (--port / --sweep-ports)"
+
+msgid "Delete Scan Profile"
+msgstr "Удалить профиль сканирования"
+
+msgid "Enter a profile name (1-32 alphanumeric, dash or underscore characters). Saved profiles can be reused in the Schedule tab."
+msgstr "Введите имя профиля (1-32 буквы, цифры, дефис или подчёркивание). Сохранённые профили можно использовать во вкладке «Расписание»."
+
+msgid "Exclude Countries (--exclude-country)"
+msgstr "Исключить страны (--exclude-country)"
+
+msgid "Failed to delete profile: "
+msgstr "Не удалось удалить профиль: "
+
+msgid "Failed to save profile: "
+msgstr "Не удалось сохранить профиль: "
+
+msgid "Full Subnet Scan (-f / --full)"
+msgstr "Полное сканирование подсетей (-f / --full)"
+
+msgid "Full subnet or speed scanning takes significant time (several minutes). Continue?"
+msgstr "Полное сканирование подсетей или замер скорости занимает значительное время (несколько минут). Продолжить?"
+
+msgid "Highest Speed (speed)"
+msgstr "Максимальная скорость (speed)"
+
+msgid "Invalid profile name."
+msgstr "Некорректное имя профиля."
+
+msgid "Lowest Ping (ping)"
+msgstr "Минимальный пинг (ping)"
+
+msgid "MASQUE Retry Attempts (--masque-attempts)"
+msgstr "Попытки повтора MASQUE (--masque-attempts)"
+
+msgid "MASQUE SNI Host (--masque-sni)"
+msgstr "SNI-хост для MASQUE (--masque-sni)"
+
+msgid "Manage Profiles on Scan Tab"
+msgstr "Управление профилями на вкладке Сканирование"
+
+msgid "Probe all IPs in WARP ranges instead of sampling"
+msgstr "Проверять все IP в диапазонах WARP вместо выборки"
+
+msgid "Profile defining scan protocol (AWG/WG), sample size, in-tunnel ping, and node exclusions. Create or edit profiles on the Scan tab."
+msgstr "Профиль с протоколом (AWG/WG), выборкой, пингом внутри туннеля и исключениями узлов. Создавайте и редактируйте профили на вкладке «Сканирование»."
+
+msgid "Profile deleted: "
+msgstr "Профиль удалён: "
+
+msgid "Profile:"
+msgstr "Профиль:"
+
+msgid "Save As..."
+msgstr "Сохранить как..."
+
+msgid "Save Profile"
+msgstr "Сохранить профиль"
+
+msgid "Save Scan Profile As"
+msgstr "Сохранить профиль сканирования как"
+
+msgid "Scan IPv6 Endpoints (-6 / --ipv6)"
+msgstr "Сканировать IPv6-адреса (-6 / --ipv6)"
+
+msgid "Scan Profiles & Launch Parameters"
+msgstr "Профили сканирования и параметры запуска"
+
+msgid "Scan profile saved: "
+msgstr "Профиль сканирования сохранён: "
+
+msgid "Sweep: All ports"
+msgstr "Перебор: все порты"
+
+msgid "Sweep: Default"
+msgstr "Перебор: по умолчанию"
+
+msgid "Sweep: Open ports"
+msgstr "Перебор: открытые порты"
+
+msgid "Target Countries (--country)"
+msgstr "Целевые страны (--country)"
+
+msgid "Protocol Packages"
+msgstr "Пакеты протоколов"
+
+msgid "Refresh Capabilities"
+msgstr "Обновить статус пакетов"
+
+msgid "Allow scheduled scans to automatically rotate this tunnel endpoint"
+msgstr "Разрешить планировщику автоматически обновлять endpoint этого туннеля"
+
+msgid "Auto (Global best endpoint)"
+msgstr "Авто (лучший общий endpoint)"
+
+msgid "Auto (or e.g. ARN, FRA, HEL)"
+msgstr "Авто (или напр. ARN, FRA, HEL)"
+
+msgid "Edit"
+msgstr "Изменить"
+
+msgid "Edit Tunnel Settings: "
+msgstr "Настройки туннеля: "
+
+msgid "Failed to update tunnel settings: "
+msgstr "Не удалось обновить настройки туннеля: "
+
+msgid "If disabled, scheduled scans will never modify this tunnel."
+msgstr "Если отключено, планировщик никогда не будет изменять этот туннель."
+
+msgid "Leave empty for Auto, or enter node code e.g. ARN, FRA, HEL"
+msgstr "Оставьте пустым для Авто или введите код узла (напр. ARN, FRA, HEL)"
+
+msgid "Managed"
+msgstr "Управляемый"
+
+msgid "Managed by Scheduler"
+msgstr "Управляется планировщиком"
+
+msgid "Managed by Scheduler (Auto-Update)"
+msgstr "Управляется планировщиком (автообновление)"
+
+msgid "No matching endpoint available from last scan. Run a scan first."
+msgstr "Подходящий endpoint не найден в последнем сканировании. Сначала выполните сканирование."
+
+msgid "Node / Country"
+msgstr "Узел / Страна"
+
+msgid "Pin: "
+msgstr "Узел: "
+
+msgid "Pinned Node"
+msgstr "Закреплённый узел"
+
+msgid "Pinned Node (Optional)"
+msgstr "Закреплённый узел (необязательно)"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Tunnel settings updated for "
+msgstr "Настройки туннеля обновлены для "
+
+msgid "Unmanaged"
+msgstr "Вручную"
+
+msgid "When pinned (e.g. ARN), the scheduler only rotates this tunnel to the best endpoint from that node."
+msgstr "При закреплении (напр. ARN) планировщик будет обновлять туннель только на лучший endpoint этого же узла."
+
+msgid "Check for Updates"
+msgstr "Проверить обновления"
+
+msgid "Checking Versions"
+msgstr "Проверка версий"
+
+msgid "Checking latest releases on GitHub..."
+msgstr "Проверка последних релизов на GitHub..."
+
+msgid "Latest"
+msgstr "Актуальная"
+
+msgid "Outdated"
+msgstr "Устарела"
+
+msgid "Version Status"
+msgstr "Статус версий"
+
+msgid "warpscout Binary"
+msgstr "Бинарник warpscout"
+

@@ -1,0 +1,98 @@
+name: CI Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext python3
+
+      - name: Validate shell scripts syntax
+        run: |
+          sh -n install.sh
+          sh -n root/etc/uci-defaults/90_luci-app-warpscout
+          sh -n root/etc/init.d/warpscout-socks
+          for f in root/usr/libexec/warpscout/*.sh; do
+            echo "Checking $f..."
+            bash -n "$f"
+          done
+
+      - name: Validate JSON, ACL & Menu consistency
+        run: |
+          python3 - <<'PY'
+          import glob, json, re
+
+          for f in glob.glob("root/usr/share/**/*.json", recursive=True):
+              print("Checking", f)
+              json.load(open(f))
+
+          acl = json.load(open("root/usr/share/rpcd/acl.d/luci-app-warpscout.json"))["luci-app-warpscout"]
+          acl_methods = set(acl["read"]["ubus"]["luci.warpscout"]) | set(acl["write"]["ubus"]["luci.warpscout"])
+
+          ucode_src = open("root/usr/share/rpcd/ucode/luci.warpscout").read()
+          m = re.search(r"const methods = \{(.*)\};\s*return \{ 'luci\.warpscout': methods \};", ucode_src, re.S)
+          assert m, "Could not locate methods block in luci.warpscout"
+          defined_methods = set(re.findall(r"^\t([a-zA-Z0-9_]+):\s*\{", m.group(1), re.M))
+
+          missing_acl = defined_methods - acl_methods
+          assert not missing_acl, f"RPC methods missing from ACL: {missing_acl}"
+
+          menu = json.load(open("root/usr/share/luci/menu.d/luci-app-warpscout.json"))
+          menu_routes = set(menu.keys())
+          for f in glob.glob("htdocs/luci-static/resources/view/warpscout/*.js"):
+              src = open(f).read()
+              for u in re.findall(r"L\.url\('([^']+)'\)", src):
+                  assert u in menu_routes, f"{f}: L.url('{u}') not found in menu.d"
+              assert "admin/vpn" not in src, f"{f}: stale admin/vpn reference found"
+          print(f"PASS: {len(defined_methods)} RPC methods match ACL and menu routes")
+          PY
+
+      - name: Run ucode & JS regression guards + syntax checks
+        run: |
+          ! grep -rn "undefined" root/
+          ! grep -rn "background:\s*#fafafa" htdocs/
+          ! grep -rn "E([^,]*, E(" htdocs/
+          ! grep -rn "['\"] + E(" htdocs/
+          for f in htdocs/luci-static/resources/view/warpscout/*.js; do
+            echo "Checking JS syntax: $f"
+            node --check "$f"
+          done
+
+      - name: Validate localization & translation coverage
+        run: |
+          msgfmt -c -o /dev/null po/templates/warpscout.pot
+          msgfmt -c --statistics -o /dev/null po/ru/warpscout.po
+          python3 - <<'PY'
+          import glob, json, re
+          strings = set()
+          for f in glob.glob("htdocs/luci-static/resources/view/warpscout/*.js"):
+              c = open(f).read()
+              for m in re.finditer(r"_\(\s*'([^'\\]*(?:\\.[^'\\]*)*)'\s*\)", c): strings.add(m.group(1))
+              for m in re.finditer(r"_\(\s*\"([^\"\\]*(?:\\.[^\"\\]*)*)\"\s*\)", c): strings.add(m.group(1))
+          menu = json.load(open("root/usr/share/luci/menu.d/luci-app-warpscout.json"))
+          for v in menu.values():
+              if isinstance(v, dict) and "title" in v: strings.add(v["title"])
+
+          def esc(s): return s.replace("\\", "\\\\").replace('"', '\\"')
+          ru_text = open("po/ru/warpscout.po").read()
+          existing = set(re.findall(r'^msgid "(.*)"$', ru_text, re.M))
+          missing = [s for s in strings if esc(s) not in existing]
+          assert not missing, f"Missing Russian translations: {missing}"
+          print(f"PASS: all {len(strings)} UI strings translated")
+          PY

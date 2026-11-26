@@ -1,0 +1,104 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2026 WarpScout LuCI App Authors
+# Licensed under the MIT License.
+# procd init script for warpscout socks proxy
+
+START=95
+STOP=10
+USE_PROCD=1
+
+CONFIG="warpscout"
+
+start_service() {
+	config_load "$CONFIG"
+
+	local enabled endpoint proto listen port account binary allow_lan
+	config_get_bool enabled socks enabled 0
+	[ "$enabled" -eq 1 ] || return 0
+
+	config_get binary main binary '/usr/bin/warpscout'
+	config_get account main account '/etc/warpscout/account.json'
+
+	config_get endpoint socks endpoint ''
+	config_get proto socks proto 'awg'
+	config_get_bool allow_lan socks allow_lan 0
+	if [ "$allow_lan" -eq 1 ]; then
+		listen="0.0.0.0"
+	else
+		config_get listen socks listen '127.0.0.1'
+	fi
+	config_get port socks port '1080'
+
+	[ -x "$binary" ] || {
+		logger -t warpscout-socks "Binary $binary not found or not executable"
+		return 1
+	}
+	[ -f "$account" ] || {
+		logger -t warpscout-socks "Account file $account not found"
+		return 1
+	}
+	[ -n "$endpoint" ] || {
+		logger -t warpscout-socks "No endpoint configured for socks proxy"
+		return 1
+	}
+
+	procd_open_instance "warpscout-socks"
+	procd_set_param command "$binary" socks \
+		-e "$endpoint" \
+		-p "$proto" \
+		-l "$listen" \
+		-P "$port" \
+		-a "$account"
+
+	# Check AmneziaWG / MASQUE parameters when applicable
+	if [ "$proto" = "awg" ]; then
+		local jc jmin jmax i1 gen_junk gen_i1 i1_sni
+		config_get jc socks jc ''
+		config_get jmin socks jmin ''
+		config_get jmax socks jmax ''
+		config_get i1 socks i1 ''
+		config_get_bool gen_junk socks gen_junk 0
+		config_get gen_i1 socks gen_i1 ''
+		config_get i1_sni socks i1_sni ''
+
+		[ -z "$jc" ] && config_get jc default jc ''
+		[ -z "$jmin" ] && config_get jmin default jmin ''
+		[ -z "$jmax" ] && config_get jmax default jmax ''
+		[ -z "$i1" ] && config_get i1 default i1 ''
+		[ "$gen_junk" -eq 0 ] && config_get_bool gen_junk default gen_junk 0
+		[ -z "$gen_i1" ] && config_get gen_i1 default gen_i1 ''
+		[ -z "$i1_sni" ] && config_get i1_sni default i1_sni ''
+
+		[ "$gen_junk" -eq 1 ] && procd_append_param command -gen-junk
+		[ -n "$gen_i1" ] && procd_append_param command -gen-i1 "$gen_i1"
+		[ -n "$i1_sni" ] && procd_append_param command -i1-sni "$i1_sni"
+		[ -n "$jc" ] && procd_append_param command -jc "$jc"
+		[ -n "$jmin" ] && procd_append_param command -jmin "$jmin"
+		[ -n "$jmax" ] && procd_append_param command -jmax "$jmax"
+		[ -n "$i1" ] && procd_append_param command -i1 "$i1"
+	elif [ "$proto" = "masque" ] || [ "$proto" = "masque-h2" ]; then
+		local masque_sni masque_attempts
+		config_get masque_sni socks masque_sni ''
+		config_get masque_attempts socks masque_attempts ''
+		[ -z "$masque_sni" ] && config_get masque_sni default masque_sni ''
+		[ -z "$masque_attempts" ] && config_get masque_attempts default masque_attempts ''
+		[ -n "$masque_sni" ] && procd_append_param command -masque-sni "$masque_sni"
+		[ -n "$masque_attempts" ] && procd_append_param command -masque-attempts "$masque_attempts"
+	fi
+
+	procd_set_param env NO_COLOR=1
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	procd_set_param respawn 3600 5 0
+	procd_close_instance
+
+	logger -t warpscout-socks "Started warpscout socks proxy on ${listen}:${port} -> ${endpoint} (${proto})"
+}
+
+stop_service() {
+	logger -t warpscout-socks "Stopping warpscout socks proxy"
+}
+
+service_triggers() {
+	procd_add_reload_trigger "$CONFIG"
+}

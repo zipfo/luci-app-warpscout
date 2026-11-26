@@ -1,0 +1,155 @@
+name: Release Packages & Custom Feed
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-ipk:
+    runs-on: ubuntu-latest
+    container:
+      image: openwrt/sdk:x86-64-24.10.0
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: Build .ipk package and opkg feed index
+        run: |
+          set -e
+          mkdir -p package/luci-app-warpscout
+          cp -r src/Makefile src/htdocs src/po src/root package/luci-app-warpscout/
+
+          # Update only luci feed to resolve luci.mk and luci-base dependencies
+          ./scripts/feeds update luci
+          ./scripts/feeds install -a -p luci
+
+          make defconfig
+          make package/luci-app-warpscout/compile V=s
+
+          mkdir -p out/ipk
+          find bin/packages -type f -name 'luci-*warpscout*.ipk' -exec cp -v {} out/ipk/ \;
+
+          # Generate opkg Packages & Packages.gz index
+          ./scripts/ipkg-make-index.sh out/ipk > out/ipk/Packages
+          gzip -k -f out/ipk/Packages
+          ls -la out/ipk
+
+      - name: Upload .ipk artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipk-feed
+          path: ${{ github.workspace }}/out/ipk
+
+  build-apk:
+    runs-on: ubuntu-latest
+    container:
+      image: openwrt/sdk:x86-64-snapshot
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: src
+
+      - name: Build .apk package and apk feed index
+        run: |
+          set -e
+          mkdir -p package/luci-app-warpscout
+          cp -r src/Makefile src/htdocs src/po src/root package/luci-app-warpscout/
+
+          ./scripts/feeds update luci
+          ./scripts/feeds install -a -p luci
+
+          make defconfig
+          make package/luci-app-warpscout/compile V=s
+
+          mkdir -p out/apk
+          find bin/packages -type f -name 'luci-*warpscout*.apk' -exec cp -v {} out/apk/ \;
+
+          # Generate apk packages.adb index using SDK host apk tool
+          APK_BIN="$(command -v apk || find staging_dir/host/bin -name apk -type f | head -n 1)"
+          "$APK_BIN" mkndx --allow-untrusted --output out/apk/packages.adb out/apk/*.apk
+          ls -la out/apk
+
+      - name: Upload .apk artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-feed
+          path: ${{ github.workspace }}/out/apk
+
+  release:
+    needs: [build-ipk, build-apk]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download .ipk artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ipk-feed
+          path: release-assets/ipk
+
+      - name: Download .apk artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-feed
+          path: release-assets/apk
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release-assets/ipk/*.ipk
+            release-assets/apk/*.apk
+
+  publish-feed:
+    needs: [build-ipk, build-apk]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download .ipk artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ipk-feed
+          path: feed-site/ipk
+
+      - name: Download .apk artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-feed
+          path: feed-site/apk
+
+      - name: Prepare GitHub Pages feed directory
+        run: |
+          cp install.sh feed-site/install.sh
+          cat > feed-site/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head><meta charset="utf-8"><title>luci-app-warpscout OpenWrt Feed</title></head>
+          <body>
+            <h1>luci-app-warpscout OpenWrt Feed</h1>
+            <p>Install automatically:</p>
+            <pre>wget -qO- https://zipfo.github.io/luci-app-warpscout/install.sh | sh</pre>
+            <ul>
+              <li><a href="ipk/Packages">opkg feed (OpenWrt 24.10): ipk/</a></li>
+              <li><a href="apk/packages.adb">apk feed (OpenWrt 25.x / snapshot): apk/</a></li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Deploy feed to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./feed-site

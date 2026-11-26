@@ -1,0 +1,1101 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-warpscout\n"
+
+msgid " (PID: "
+msgstr ""
+
+msgid " and verifying handshake..."
+msgstr ""
+
+msgid " created successfully!"
+msgstr ""
+
+msgid " deleted."
+msgstr ""
+
+msgid " endpoints verified"
+msgstr ""
+
+msgid "# No active WarpScout crontab block found."
+msgstr ""
+
+msgid "(/etc/init.d/cron)"
+msgstr ""
+
+msgid "(Log file is empty)"
+msgstr ""
+
+msgid ", PID: "
+msgstr ""
+
+msgid "/dev/net/tun Device"
+msgstr ""
+
+msgid "0% Loss Only"
+msgstr ""
+
+msgid "ACTIONS"
+msgstr ""
+
+msgid "AWG Custom I1 Packet (--i1)"
+msgstr ""
+
+msgid "AWG Generate I1 (--gen-i1 / --i1-sni)"
+msgstr ""
+
+msgid "AWG Obfuscation: Jc / Jmin / Jmax"
+msgstr ""
+
+msgid "AWG Randomize Junk (--gen-junk)"
+msgstr ""
+
+msgid "Absent (not needed for CLI scan/SOCKS)"
+msgstr ""
+
+msgid "Account File"
+msgstr ""
+
+msgid "Account File Path"
+msgstr ""
+
+msgid "Account successfully registered: "
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Activate background periodic scan via OpenWrt system crontab."
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Active Target Endpoint:"
+msgstr ""
+
+msgid "Allow LAN Access"
+msgstr ""
+
+msgid "Allow scheduled scans to automatically rotate this tunnel endpoint"
+msgstr ""
+
+msgid "AmneziaWG (awg) - Anti-DPI Obfuscation (Recommended)"
+msgstr ""
+
+msgid "Applied best scan endpoint: "
+msgstr ""
+
+msgid "Applying SOCKS5 Configuration"
+msgstr ""
+
+msgid "Are you sure you want to cancel the active scan?"
+msgstr ""
+
+msgid "Are you sure you want to delete scan profile "
+msgstr ""
+
+msgid "Are you sure you want to delete tunnel interface "
+msgstr ""
+
+msgid "Are you sure you want to recreate the WARP account? This will generate new keys and register a fresh device identity."
+msgstr ""
+
+msgid "Are you sure you want to truncate /var/log/warpscout.log? This action cannot be undone."
+msgstr ""
+
+msgid "Assigned IPv4 / IPv6"
+msgstr ""
+
+msgid "Auto (Global best endpoint)"
+msgstr ""
+
+msgid "Auto (or e.g. ARN, FRA, HEL)"
+msgstr ""
+
+msgid "Auto-Update automatically reconfigures and re-handshakes all managed WireGuard and AmneziaWG interfaces to the best discovered endpoint."
+msgstr ""
+
+msgid "Automatically throttled on routers with < 256 MB RAM to prevent OOM."
+msgstr ""
+
+msgid "Best Endpoint Criterion (--best-by)"
+msgstr ""
+
+msgid "Best: "
+msgstr ""
+
+msgid "Binary Path"
+msgstr ""
+
+msgid "Binary Status"
+msgstr ""
+
+msgid "Binary path and account file path cannot be empty."
+msgstr ""
+
+msgid "Bind to 0.0.0.0 so other computers and phones on your home network can use this SOCKS5 proxy."
+msgstr ""
+
+msgid "Built-in iCloud probe"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Cancel Scan"
+msgstr ""
+
+msgid "Cancellation signal sent."
+msgstr ""
+
+msgid "Capabilities Cache TTL (seconds)"
+msgstr ""
+
+msgid "Checking system kernel, packages and protocol handlers..."
+msgstr ""
+
+msgid "Clear Execution Log"
+msgstr ""
+
+msgid "Clear Log"
+msgstr ""
+
+msgid "Click \"Test SOCKS Proxy\" above to verify port reachability and query Cloudflare trace."
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Cloudflare WARP Account"
+msgstr ""
+
+msgid "Components Missing"
+msgstr ""
+
+msgid "Configuration snapshot generated from best discovered endpoint: "
+msgstr ""
+
+msgid "Configure automatic periodic endpoint scanning and seamless rotation of managed WireGuard / AmneziaWG tunnels."
+msgstr ""
+
+msgid "Configure core engine paths, inspect runtime logs, and export sanitized system diagnostics without exposing private keys."
+msgstr ""
+
+msgid "Configured"
+msgstr ""
+
+msgid "Configured Tunnels"
+msgstr ""
+
+msgid "Configuring UCI network and firewall, bringing up interface and verifying handshake..."
+msgstr ""
+
+msgid "Connectivity Test Results"
+msgstr ""
+
+msgid "Contacting Cloudflare API to register WARP account..."
+msgstr ""
+
+msgid "Copied to clipboard!"
+msgstr ""
+
+msgid "Copy IP"
+msgstr ""
+
+msgid "Copy Sanitized Report (JSON)"
+msgstr ""
+
+msgid "Copy to Clipboard"
+msgstr ""
+
+msgid "Core Settings"
+msgstr ""
+
+msgid "Create & Apply Tunnel"
+msgstr ""
+
+msgid "Create New Tunnel Interface"
+msgstr ""
+
+msgid "Create and start a new network interface directly from the latest scan discovery configuration."
+msgstr ""
+
+msgid "Creating Tunnel Interface"
+msgstr ""
+
+msgid "Cron Expression"
+msgstr ""
+
+msgid "Cron expression cannot be empty."
+msgstr ""
+
+msgid "Crond Daemon:"
+msgstr ""
+
+msgid "Custom Port / Port Sweep (--port / --sweep-ports)"
+msgstr ""
+
+msgid "Custom cron expression..."
+msgstr ""
+
+msgid "DOWN"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete Scan Profile"
+msgstr ""
+
+msgid "Device ID"
+msgstr ""
+
+msgid "Direct Target IPs (--target)"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "Discovered Endpoints"
+msgstr ""
+
+msgid "Download Diagnostics (.json)"
+msgstr ""
+
+msgid "ENDPOINT"
+msgstr ""
+
+msgid "EXIT / NODE"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Edit Tunnel Settings: "
+msgstr ""
+
+msgid "Enable SOCKS5 Proxy"
+msgstr ""
+
+msgid "Enable Scheduled Scan"
+msgstr ""
+
+msgid "Enabled / Idle"
+msgstr ""
+
+msgid "Endpoint"
+msgstr ""
+
+msgid "Endpoint copied: "
+msgstr ""
+
+msgid "Endpoint updated to "
+msgstr ""
+
+msgid "Enter a profile name (1-32 alphanumeric, dash or underscore characters). Saved profiles can be reused in the Schedule tab."
+msgstr ""
+
+msgid "Environment snapshot for troubleshooting. Private keys and raw tokens are automatically stripped."
+msgstr ""
+
+msgid "Error: "
+msgstr ""
+
+msgid "Every 12 hours"
+msgstr ""
+
+msgid "Every 2 hours"
+msgstr ""
+
+msgid "Every 6 hours"
+msgstr ""
+
+msgid "Every minute (Testing only)"
+msgstr ""
+
+msgid "Every night at 04:00 (Recommended)"
+msgstr ""
+
+msgid "Exclude Countries (--exclude-country)"
+msgstr ""
+
+msgid "Exclude Edge Nodes (--exclude-node)"
+msgstr ""
+
+msgid "Execution Log (/var/log/warpscout.log)"
+msgstr ""
+
+msgid "Exit: "
+msgstr ""
+
+msgid "Export to CSV"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Failed to clear log file."
+msgstr ""
+
+msgid "Failed to copy to clipboard"
+msgstr ""
+
+msgid "Failed to create tunnel: "
+msgstr ""
+
+msgid "Failed to delete profile: "
+msgstr ""
+
+msgid "Failed to delete tunnel: "
+msgstr ""
+
+msgid "Failed to save profile: "
+msgstr ""
+
+msgid "Failed to save schedule."
+msgstr ""
+
+msgid "Failed to save settings."
+msgstr ""
+
+msgid "Failed to start scan: "
+msgstr ""
+
+msgid "Failed to start test job: "
+msgstr ""
+
+msgid "Failed to update SOCKS configuration."
+msgstr ""
+
+msgid "Failed to update tunnel settings: "
+msgstr ""
+
+msgid "Filter Country"
+msgstr ""
+
+msgid "Filter Node / City"
+msgstr ""
+
+msgid "Firewall Zone"
+msgstr ""
+
+msgid "Found best endpoint: "
+msgstr ""
+
+msgid "Frequency Preset"
+msgstr ""
+
+msgid "Full Subnet Scan (-f / --full)"
+msgstr ""
+
+msgid "Full subnet or speed scanning takes significant time (several minutes). Continue?"
+msgstr ""
+
+msgid "Generated WireGuard / AmneziaWG Configuration"
+msgstr ""
+
+msgid "Go to Scanner"
+msgstr ""
+
+msgid "HOST PING"
+msgstr ""
+
+msgid "Handshake"
+msgstr ""
+
+msgid "Handshake established."
+msgstr ""
+
+msgid "Handshake verified with endpoint: "
+msgstr ""
+
+msgid "Highest Speed (speed)"
+msgstr ""
+
+msgid "If disabled, scheduled scans will never modify this tunnel."
+msgstr ""
+
+msgid "Important Usage Notes"
+msgstr ""
+
+msgid "In-Tunnel Ping & Loss (-P)"
+msgstr ""
+
+msgid "Initializing scan process..."
+msgstr ""
+
+msgid "Inspect discovered endpoints with real in-tunnel round-trip times and packet loss. Copy endpoints or export configurations directly into network tunnels."
+msgstr ""
+
+msgid "Installed"
+msgstr ""
+
+msgid "Interface"
+msgstr ""
+
+msgid "Interface MTU"
+msgstr ""
+
+msgid "Interface Name (max 15 chars)"
+msgstr ""
+
+msgid "Interface name must be 1 to 15 alphanumeric characters."
+msgstr ""
+
+msgid "Introduces a random sleep (0 to N seconds) before scanning to avoid synchronized load spikes and network congestion."
+msgstr ""
+
+msgid "Invalid profile name."
+msgstr ""
+
+msgid "Job ID: "
+msgstr ""
+
+msgid "Kernel Version"
+msgstr ""
+
+msgid "LOCATION"
+msgstr ""
+
+msgid "LOSS"
+msgstr ""
+
+msgid "Last 100 lines"
+msgstr ""
+
+msgid "Last 200 lines"
+msgstr ""
+
+msgid "Last 500 lines"
+msgstr ""
+
+msgid "Last Execution:"
+msgstr ""
+
+msgid "Last scan completed successfully! "
+msgstr ""
+
+msgid "Last scan failed (exit code "
+msgstr ""
+
+msgid "Latest Scan Summary"
+msgstr ""
+
+msgid "Launch warpscout socks proxy in background via procd."
+msgstr ""
+
+msgid "Launching Scanner"
+msgstr ""
+
+msgid "Leave empty for Auto, or enter node code e.g. ARN, FRA, HEL"
+msgstr ""
+
+msgid "Listen Port"
+msgstr ""
+
+msgid "Live Scanner Output:"
+msgstr ""
+
+msgid "Loading Generated Tunnel Config"
+msgstr ""
+
+msgid "Log file cleared."
+msgstr ""
+
+msgid "Lowest Ping (ping)"
+msgstr ""
+
+msgid "MASQUE (masque) - CONNECT-IP over QUIC"
+msgstr ""
+
+msgid "MASQUE Retry Attempts (--masque-attempts)"
+msgstr ""
+
+msgid "MASQUE SNI Host (--masque-sni)"
+msgstr ""
+
+msgid "MASQUE-H2 (masque-h2) - CONNECT-IP over HTTP/2 TCP"
+msgstr ""
+
+msgid "Make Tunnel"
+msgstr ""
+
+msgid "Manage Profiles on Scan Tab"
+msgstr ""
+
+msgid "Manage permanent in-kernel network tunnel interfaces created from discovered Cloudflare WARP endpoints."
+msgstr ""
+
+msgid "Managed"
+msgstr ""
+
+msgid "Managed by Scheduler"
+msgstr ""
+
+msgid "Managed by Scheduler (Auto-Update)"
+msgstr ""
+
+msgid "Max Parallel Tunnel Jobs (-jt)"
+msgstr ""
+
+msgid "Maximum Jitter Delay (seconds)"
+msgstr ""
+
+msgid "Measure Download Speed (--speed)"
+msgstr ""
+
+msgid "Missing"
+msgstr ""
+
+msgid "Missing / Incomplete"
+msgstr ""
+
+msgid "Module missing"
+msgstr ""
+
+msgid "Never"
+msgstr ""
+
+msgid "No WARP scan has been executed yet, or previous scans did not discover working endpoints. Run a scan from the Scanner view to discover optimal endpoints."
+msgstr ""
+
+msgid "No WireGuard or AmneziaWG interfaces configured yet."
+msgstr ""
+
+msgid "No configuration file found."
+msgstr ""
+
+msgid "No data to export"
+msgstr ""
+
+msgid "No discovery scan results available"
+msgstr ""
+
+msgid "No endpoints match the selected filters."
+msgstr ""
+
+msgid "No error details captured in stderr."
+msgstr ""
+
+msgid "No matching endpoint available from last scan. Run a scan first."
+msgstr ""
+
+msgid "No previous job record"
+msgstr ""
+
+msgid "No scan performed yet"
+msgstr ""
+
+msgid "Node / Country"
+msgstr ""
+
+msgid "Node: "
+msgstr ""
+
+msgid "None configured"
+msgstr ""
+
+msgid "Not found"
+msgstr ""
+
+msgid "Not installed"
+msgstr ""
+
+msgid "Notice: Handshake pending."
+msgstr ""
+
+msgid "Notice: Interface created, but initial handshake was not received within 15 seconds."
+msgstr ""
+
+msgid "OpenWrt LuCI management wrapper for warpscout CLI utility. Supports WireGuard, AmneziaWG, and MASQUE protocols."
+msgstr ""
+
+msgid "OpenWrt Release / Target"
+msgstr ""
+
+msgid "Optimal Discovered Endpoint"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Pin: "
+msgstr ""
+
+msgid "Pinned Node"
+msgstr ""
+
+msgid "Pinned Node (Optional)"
+msgstr ""
+
+msgid "Please specify a target WARP endpoint before enabling the SOCKS proxy."
+msgstr ""
+
+msgid "Port Closed"
+msgstr ""
+
+msgid "Port Open (Listening)"
+msgstr ""
+
+msgid "Port number the proxy server listens on (default: 1080)."
+msgstr ""
+
+msgid "Port unreachable"
+msgstr ""
+
+msgid "Present"
+msgstr ""
+
+msgid "Private Key Mask"
+msgstr ""
+
+msgid "Probe Timeout seconds (-t)"
+msgstr ""
+
+msgid "Probe all IPs in WARP ranges instead of sampling"
+msgstr ""
+
+msgid "Probing proxy reachability and Cloudflare CDN trace..."
+msgstr ""
+
+msgid "Profile defining scan protocol (AWG/WG), sample size, in-tunnel ping, and node exclusions. Create or edit profiles on the Scan tab."
+msgstr ""
+
+msgid "Profile deleted: "
+msgstr ""
+
+msgid "Profile:"
+msgstr ""
+
+msgid "Protocol"
+msgstr ""
+
+msgid "Protocol (-p)"
+msgstr ""
+
+msgid "Protocol Capabilities"
+msgstr ""
+
+msgid "Protocol Packages"
+msgstr ""
+
+msgid "Protocol used by userspace proxy to connect to Cloudflare edge."
+msgstr ""
+
+msgid "Proxy Configuration"
+msgstr ""
+
+msgid "Proxy Service Status"
+msgstr ""
+
+msgid "Proxy is responding! Connection verified."
+msgstr ""
+
+msgid "Quick Status"
+msgstr ""
+
+msgid "RPC error: "
+msgstr ""
+
+msgid "Reading generated configuration from artifacts..."
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "Recreate Account (--fresh)"
+msgstr ""
+
+msgid "Recreating Account"
+msgstr ""
+
+msgid "Refresh Capabilities"
+msgstr ""
+
+msgid "Refresh Log"
+msgstr ""
+
+msgid "Refreshing Capabilities"
+msgstr ""
+
+msgid "Register Account"
+msgstr ""
+
+msgid "Registering Account"
+msgstr ""
+
+msgid "Registration failed: "
+msgstr ""
+
+msgid "Results"
+msgstr ""
+
+msgid "Route Allowed IPs (Default Route)"
+msgstr ""
+
+msgid "Run New Scan"
+msgstr ""
+
+msgid "Run Scheduled Job Now (Test)"
+msgstr ""
+
+msgid "Run a standalone userspace SOCKS5 proxy to test WARP endpoints without requiring root privileges or kernel WireGuard/AmneziaWG modules."
+msgstr ""
+
+msgid "Run asynchronous discovery scans across Cloudflare WARP IP ranges and evaluate endpoint latency, packet loss, and throughput."
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Running on port "
+msgstr ""
+
+msgid "Running..."
+msgstr ""
+
+msgid "SOCKS Proxy"
+msgstr ""
+
+msgid "SOCKS Proxy: "
+msgstr ""
+
+msgid "SOCKS proxy configuration updated successfully."
+msgstr ""
+
+msgid "Samples per subnet (-n)"
+msgstr ""
+
+msgid "Sanitized diagnostics JSON copied to clipboard."
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Save & Apply Schedule"
+msgstr ""
+
+msgid "Save & Apply Settings"
+msgstr ""
+
+msgid "Save As..."
+msgstr ""
+
+msgid "Save Profile"
+msgstr ""
+
+msgid "Save Scan Profile As"
+msgstr ""
+
+msgid "Save Settings"
+msgstr ""
+
+msgid "Saving Schedule"
+msgstr ""
+
+msgid "Saving Settings"
+msgstr ""
+
+msgid "Saving job parameters and launching scan runner..."
+msgstr ""
+
+msgid "Scan"
+msgstr ""
+
+msgid "Scan & Auto-Update Managed Tunnels (Recommended)"
+msgstr ""
+
+msgid "Scan IPv6 Endpoints (-6 / --ipv6)"
+msgstr ""
+
+msgid "Scan Job ID / Time"
+msgstr ""
+
+msgid "Scan Only (Save results and configuration without rotating tunnels)"
+msgstr ""
+
+msgid "Scan Profile"
+msgstr ""
+
+msgid "Scan Profiles & Launch Parameters"
+msgstr ""
+
+msgid "Scan in progress"
+msgstr ""
+
+msgid "Scan is running (Job ID: "
+msgstr ""
+
+msgid "Scan profile saved: "
+msgstr ""
+
+msgid "Scan: "
+msgstr ""
+
+msgid "Schedule"
+msgstr ""
+
+msgid "Schedule Configuration"
+msgstr ""
+
+msgid "Schedule saved and crontab synchronized successfully."
+msgstr ""
+
+msgid "Scheduled Action"
+msgstr ""
+
+msgid "Scheduled Task:"
+msgstr ""
+
+msgid "Scheduled job launched in background. Check the Scan or Results tab for real-time progress."
+msgstr ""
+
+msgid "Scheduler Status"
+msgstr ""
+
+msgid "Select a predefined schedule interval or choose custom."
+msgstr ""
+
+msgid "Service State:"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Settings saved successfully."
+msgstr ""
+
+msgid "Socket Status:"
+msgstr ""
+
+msgid "Sort: Lowest Host Ping"
+msgstr ""
+
+msgid "Sort: Lowest Loss"
+msgstr ""
+
+msgid "Sort: Lowest Tun Ping"
+msgstr ""
+
+msgid "Sort: Node Code"
+msgstr ""
+
+msgid "Standard 5-field cron format: minute (0-59), hour (0-23), day of month (1-31), month (1-12), day of week (0-7)."
+msgstr ""
+
+msgid "Start Scan"
+msgstr ""
+
+msgid "Starting warpscout background scan process..."
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Stopped (Error)"
+msgstr ""
+
+msgid "Stored with 0600 permissions. Private keys are never exposed via RPC."
+msgstr ""
+
+msgid "Success"
+msgstr ""
+
+msgid "Sweep: All ports"
+msgstr ""
+
+msgid "Sweep: Default"
+msgstr ""
+
+msgid "Sweep: Open ports"
+msgstr ""
+
+msgid "System Crontab Status (/etc/crontabs/root)"
+msgstr ""
+
+msgid "System Diagnostics"
+msgstr ""
+
+msgid "TUN PING"
+msgstr ""
+
+msgid "Target Cloudflare WARP IP:port. You can enter an endpoint manually or click the button above to copy the best endpoint from your latest scan."
+msgstr ""
+
+msgid "Target Countries (--country)"
+msgstr ""
+
+msgid "Target Specific Nodes (--node)"
+msgstr ""
+
+msgid "Target WARP Endpoint"
+msgstr ""
+
+msgid "Test SOCKS Proxy"
+msgstr ""
+
+msgid "Test failed: "
+msgstr ""
+
+msgid "This will remove it from network and firewall configuration."
+msgstr ""
+
+msgid "Transfer (Rx / Tx)"
+msgstr ""
+
+msgid "Triggering Test Run"
+msgstr ""
+
+msgid "Tunnel "
+msgstr ""
+
+msgid "Tunnel Protocol"
+msgstr ""
+
+msgid "Tunnel configuration copied to clipboard!"
+msgstr ""
+
+msgid "Tunnel settings updated for "
+msgstr ""
+
+msgid "Tunnels"
+msgstr ""
+
+msgid "UP"
+msgstr ""
+
+msgid "Unknown error"
+msgstr ""
+
+msgid "Unmanaged"
+msgstr ""
+
+msgid "Update Endpoint"
+msgstr ""
+
+msgid "Update failed: "
+msgstr ""
+
+msgid "Updating Tunnel Endpoint"
+msgstr ""
+
+msgid "Updating UCI configuration and synchronizing system crontab..."
+msgstr ""
+
+msgid "Updating UCI settings and controlling warpscout-socks service..."
+msgstr ""
+
+msgid "Updating WarpScout UCI configuration..."
+msgstr ""
+
+msgid "Updating endpoint to "
+msgstr ""
+
+msgid "Use Best Scan Endpoint ("
+msgstr ""
+
+msgid "View / Copy Generated Config (.conf)"
+msgstr ""
+
+msgid "View Raw Diagnostics JSON & Storage/Syslog Details"
+msgstr ""
+
+msgid "View Results Table"
+msgstr ""
+
+msgid "View: All Endpoints"
+msgstr ""
+
+msgid "View: Best per Node only"
+msgstr ""
+
+msgid "Waiting for runner output..."
+msgstr ""
+
+msgid "Warning: Allowing LAN access binds SOCKS to 0.0.0.0 without authentication. Any device on your local network will be able to route traffic through this router."
+msgstr ""
+
+msgid "WarpScout"
+msgstr ""
+
+msgid "WarpScout - Cloudflare WARP Scanner & Manager"
+msgstr ""
+
+msgid "WarpScout - Discovery Results"
+msgstr ""
+
+msgid "WarpScout - Endpoint Discovery Results"
+msgstr ""
+
+msgid "WarpScout - Scanner Runner"
+msgstr ""
+
+msgid "WarpScout - WireGuard & AmneziaWG Tunnels"
+msgstr ""
+
+msgid "WarpScout Binary"
+msgstr ""
+
+msgid "WarpScout Binary Path"
+msgstr ""
+
+msgid "WarpScout SOCKS5 Proxy"
+msgstr ""
+
+msgid "WarpScout Scheduler"
+msgstr ""
+
+msgid "WarpScout Settings & Diagnostics"
+msgstr ""
+
+msgid "WarpScout manages its own isolated block inside root crontab. Any custom user cron jobs are preserved untouched."
+msgstr ""
+
+msgid "When pinned (e.g. ARN), the scheduler only rotates this tunnel to the best endpoint from that node."
+msgstr ""
+
+msgid "WireGuard (wg) - Standard UDP"
+msgstr ""
+
+msgid "Working Endpoints"
+msgstr ""
+
+msgid "Zone"
+msgstr ""
+
+msgid "ago"
+msgstr ""
+
+msgid "• No Failover: Unlike UCI network interfaces, if ISP or DPI interrupts this single UDP socket, the proxy will not automatically switch endpoints. For permanent router routing, use the Tunnels tab."
+msgstr ""
+
+msgid "• Single Tunnel Testing: Designed for quick endpoint testing, curl probes, and browser exploration without routing whole-router traffic."
+msgstr ""
+
+msgid "• Standalone Userspace Engine: warpscout socks does not require Linux kernel modules (kmod-wireguard / kmod-amneziawg) or /dev/net/tun."
+msgstr ""
+
+msgid "Check for Updates"
+msgstr ""
+
+msgid "Checking Versions"
+msgstr ""
+
+msgid "Checking latest releases on GitHub..."
+msgstr ""
+
+msgid "Latest"
+msgstr ""
+
+msgid "Outdated"
+msgstr ""
+
+msgid "Version Status"
+msgstr ""
+
+msgid "warpscout Binary"
+msgstr ""
+
+

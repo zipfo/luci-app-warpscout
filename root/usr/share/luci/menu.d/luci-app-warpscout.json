@@ -1,0 +1,76 @@
+{
+	"admin/services/warpscout": {
+		"title": "WarpScout",
+		"order": 65,
+		"action": {
+			"type": "alias",
+			"path": "admin/services/warpscout/overview"
+		},
+		"depends": {
+			"acl": [ "luci-app-warpscout" ]
+		}
+	},
+
+	"admin/services/warpscout/overview": {
+		"title": "Overview",
+		"order": 10,
+		"action": {
+			"type": "view",
+			"path": "warpscout/overview"
+		}
+	},
+
+	"admin/services/warpscout/scan": {
+		"title": "Scan",
+		"order": 30,
+		"action": {
+			"type": "view",
+			"path": "warpscout/scan"
+		}
+	},
+
+	"admin/services/warpscout/results": {
+		"title": "Results",
+		"order": 40,
+		"action": {
+			"type": "view",
+			"path": "warpscout/results"
+		}
+	},
+
+	"admin/services/warpscout/tunnels": {
+		"title": "Tunnels",
+		"order": 50,
+		"action": {
+			"type": "view",
+			"path": "warpscout/tunnels"
+		}
+	},
+
+	"admin/services/warpscout/schedule": {
+		"title": "Schedule",
+		"order": 60,
+		"action": {
+			"type": "view",
+			"path": "warpscout/schedule"
+		}
+	},
+
+	"admin/services/warpscout/socks": {
+		"title": "SOCKS Proxy",
+		"order": 70,
+		"action": {
+			"type": "view",
+			"path": "warpscout/socks"
+		}
+	},
+
+	"admin/services/warpscout/settings": {
+		"title": "Settings",
+		"order": 80,
+		"action": {
+			"type": "view",
+			"path": "warpscout/settings"
+		}
+	}
+}

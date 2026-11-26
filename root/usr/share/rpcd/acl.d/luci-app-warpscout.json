@@ -1,0 +1,52 @@
+{
+	"luci-app-warpscout": {
+		"description": "Grant access to WarpScout procedures and configurations",
+		"read": {
+			"ubus": {
+				"luci.warpscout": [
+					"getStatus",
+					"getAccount",
+					"getCapabilities",
+					"getScanStatus",
+					"getResults",
+					"getLastConfig",
+					"getTunnels",
+					"getSchedule",
+					"getSocksStatus",
+					"testSocksProxy",
+					"getSettings",
+					"getLogs",
+					"getDiagnostics",
+					"getScanProfiles"
+				]
+			},
+			"uci": [ "warpscout", "network", "firewall" ],
+			"file": {
+				"/var/log/warpscout.log": [ "read" ],
+				"/var/run/warpscout/state.json": [ "read" ],
+				"/etc/crontabs/root": [ "read" ]
+			}
+		},
+		"write": {
+			"ubus": {
+				"luci.warpscout": [
+					"registerAccount",
+					"startScan",
+					"cancelScan",
+					"applyTunnel",
+					"updateEndpoint",
+					"deleteTunnel",
+					"setTunnelConfig",
+					"setSchedule",
+					"setSocksConfig",
+					"setSettings",
+					"clearLogs",
+					"saveScanProfile",
+					"deleteScanProfile",
+					"runScheduledJob"
+				]
+			},
+			"uci": [ "warpscout", "network", "firewall" ]
+		}
+	}
+}

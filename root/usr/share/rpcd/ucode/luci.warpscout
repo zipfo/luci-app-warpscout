@@ -1,0 +1,1384 @@
+// Copyright (C) 2026 WarpScout LuCI App Authors
+// Licensed under the MIT License.
+
+'use strict';
+
+import { cursor } from 'uci';
+import { popen, open, stat, access } from 'fs';
+
+function shellquote(s) {
+	return `'${replace(s ?? '', "'", "'\\''")}'`;
+}
+
+function command(cmd) {
+	const handle = popen(cmd);
+	if (!handle)
+		return null;
+	const out = handle.read('all');
+	handle.close();
+	return trim(out ?? '');
+}
+
+function read_json(path) {
+	const file = open(path, 'r');
+	if (!file)
+		return null;
+	const content = file.read('all');
+	file.close();
+	if (!content)
+		return null;
+	try {
+		return json(content);
+	} catch (e) {
+		return null;
+	}
+}
+
+function mask_key(k) {
+	if (!k || length(k) < 8)
+		return '***';
+	return substr(k, 0, 4) + '...' + substr(k, length(k) - 4);
+}
+
+function get_config() {
+	const uci = cursor();
+	const binary = uci.get('warpscout', 'main', 'binary') || '/usr/bin/warpscout';
+	const account = uci.get('warpscout', 'main', 'account') || '/etc/warpscout/account.json';
+	const jobs = uci.get('warpscout', 'main', 'jobs') || '4';
+	const caps_ttl = uci.get('warpscout', 'main', 'caps_ttl') || '60';
+	uci.unload('warpscout');
+
+	return { binary, account, jobs, caps_ttl };
+}
+
+function get_app_version() {
+	const vfile = open('/usr/share/warpscout/version', 'r');
+	if (vfile) {
+		const v = trim(vfile.read('all') ?? '');
+		vfile.close();
+		if (length(v)) return v;
+	}
+	const opkg_v = command("opkg list-installed luci-app-warpscout 2>/dev/null | awk '{print $3}'");
+	if (opkg_v && length(opkg_v)) return split(opkg_v, '-')[0];
+	const apk_v = command("apk info -e luci-app-warpscout 2>/dev/null | sed 's/^luci-app-warpscout-//'");
+	if (apk_v && length(apk_v)) return split(apk_v, '-')[0];
+	return '0.1.0';
+}
+
+function normalize_ver(v) {
+	if (!v) return '';
+	v = trim('' + v);
+	if (substr(v, 0, 1) == 'v' || substr(v, 0, 1) == 'V') {
+		v = substr(v, 1);
+	}
+	return v;
+}
+
+function compare_semver(a, b) {
+	const pa = split(normalize_ver(a), '.');
+	const pb = split(normalize_ver(b), '.');
+	const max_len = (length(pa) > length(pb)) ? length(pa) : length(pb);
+	for (let i = 0; i < max_len; i++) {
+		const na = int(pa[i] || 0);
+		const nb = int(pb[i] || 0);
+		if (na < nb) return -1;
+		if (na > nb) return 1;
+	}
+	return 0;
+}
+
+function get_latest_github_version(repo, cache_key, force) {
+	const cache_file = '/var/run/warpscout/version_cache.json';
+	let cache = read_json(cache_file) || {};
+	const now = time();
+	const entry = cache[cache_key];
+	if (!force && entry && entry.checked_at && (now - entry.checked_at) < 3600) {
+		return entry.version || null;
+	}
+
+	let latest = null;
+	const fetch_json = (url) => {
+		const raw = command(`uclient-fetch -q -T 3 -O - ${shellquote(url)} 2>/dev/null || wget -q -T 3 -O - ${shellquote(url)} 2>/dev/null`);
+		if (!raw || !length(raw)) return null;
+		try { return json(raw); } catch (e) { return null; }
+	};
+
+	const rel = fetch_json(`https://api.github.com/repos/${repo}/releases/latest`);
+	if (rel?.tag_name) {
+		latest = normalize_ver(rel.tag_name);
+	} else {
+		const tags = fetch_json(`https://api.github.com/repos/${repo}/tags`);
+		if (type(tags) == 'array' && length(tags) > 0 && tags[0]?.name) {
+			latest = normalize_ver(tags[0].name);
+		}
+	}
+
+	if (latest) {
+		cache[cache_key] = { version: latest, checked_at: now };
+		command('mkdir -p /var/run/warpscout');
+		const f = open(cache_file, 'w');
+		if (f) {
+			f.write(sprintf('%J\n', cache));
+			f.close();
+		}
+	}
+
+	return latest;
+}
+
+const methods = {
+	getStatus: {
+		args: {
+			force: false
+		},
+		call: function(req) {
+			const cfg = get_config();
+			const force = !!req.args?.force;
+
+			// 1. Check binary status
+			const bin_stat = stat(cfg.binary);
+			const bin_installed = (bin_stat && (bin_stat.type == 'file' || bin_stat.type == 'link'));
+			let bin_version = null;
+			if (bin_installed) {
+				bin_version = normalize_ver(command(`${shellquote(cfg.binary)} version 2>/dev/null`));
+			}
+			const bin_latest = get_latest_github_version('vernette/warpscout', 'warpscout_bin', force);
+			const bin_cmp = (bin_installed && bin_version && bin_latest) ? compare_semver(bin_version, bin_latest) : null;
+
+			// 2. Check luci-app-warpscout version
+			const app_version = normalize_ver(get_app_version());
+			const app_latest = get_latest_github_version('zipfo/luci-app-warpscout', 'luci_app', force);
+			const app_cmp = (app_version && app_latest) ? compare_semver(app_version, app_latest) : null;
+
+			// 3. Check account status
+			const acc_stat = stat(cfg.account);
+			const acc_exists = (acc_stat && acc_stat.type == 'file') ? true : false;
+			let acc_info = {
+				exists: acc_exists,
+				path: cfg.account,
+				id: null,
+				ipv4: null,
+				ipv6: null,
+				key_mask: null,
+				has_masque: false,
+				has_outer: false,
+				mtime: acc_stat?.mtime || null
+			};
+
+			if (acc_exists) {
+				const acc_data = read_json(cfg.account);
+				if (acc_data) {
+					acc_info.id = acc_data.id || null;
+					acc_info.ipv4 = acc_data.ipv4 || null;
+					acc_info.ipv6 = acc_data.ipv6 || null;
+					acc_info.key_mask = mask_key(acc_data.private_key);
+					acc_info.has_masque = !!acc_data.masque;
+					acc_info.has_outer = !!acc_data.outer;
+				}
+			}
+
+			// 4. Read state.json if present
+			const state = read_json('/var/run/warpscout/state.json');
+
+			return {
+				binary: {
+					path: cfg.binary,
+					installed: bin_installed,
+					version: bin_version,
+					latest_version: bin_latest,
+					up_to_date: (bin_cmp !== null && bin_cmp >= 0),
+					outdated: (bin_cmp !== null && bin_cmp < 0)
+				},
+				app: {
+					version: app_version,
+					latest_version: app_latest,
+					up_to_date: (app_cmp !== null && app_cmp >= 0),
+					outdated: (app_cmp !== null && app_cmp < 0)
+				},
+				account: acc_info,
+				state: state
+			};
+		}
+	},
+
+	getAccount: {
+		call: function(req) {
+			const cfg = get_config();
+			const acc_stat = stat(cfg.account);
+			if (!acc_stat || acc_stat.type != 'file') {
+				return { exists: false, path: cfg.account };
+			}
+
+			const acc_data = read_json(cfg.account);
+			if (!acc_data) {
+				return { exists: true, valid: false, path: cfg.account };
+			}
+
+			return {
+				exists: true,
+				valid: true,
+				path: cfg.account,
+				id: acc_data.id || null,
+				ipv4: acc_data.ipv4 || null,
+				ipv6: acc_data.ipv6 || null,
+				key_mask: mask_key(acc_data.private_key),
+				peer_public_key: acc_data.peer_public_key || null,
+				has_masque: !!acc_data.masque,
+				has_outer: !!acc_data.outer,
+				mtime: acc_stat.mtime
+			};
+		}
+	},
+
+	getCapabilities: {
+		args: {
+			force: false
+		},
+		call: function(req) {
+			const cfg = get_config();
+			const state_file = '/var/run/warpscout/state.json';
+			let state = read_json(state_file) || {};
+
+			const now = time();
+			const cached_caps = state?.caps;
+			const ttl = int(cfg.caps_ttl) || 60;
+
+			if (!req.args?.force && cached_caps && cached_caps.checked_at && (now - cached_caps.checked_at < ttl)) {
+				return cached_caps;
+			}
+
+			const caps_script = '/usr/libexec/warpscout/capabilities.sh';
+			const raw_json = command(caps_script);
+			let caps = null;
+			if (raw_json) {
+				try {
+					caps = json(raw_json);
+				} catch (e) {
+					caps = null;
+				}
+			}
+
+			if (caps) {
+				state.caps = caps;
+				command(`mkdir -p /var/run/warpscout && echo ${shellquote(sprintf('%J', state))} > ${state_file}`);
+				return caps;
+			}
+
+			return {
+				error: 'Failed to execute capabilities detector',
+				raw: raw_json
+			};
+		}
+	},
+
+	startScan: {
+		args: {
+			proto: '',
+			tun_ping: false,
+			speed: false,
+			best_by: '',
+			sample: 0,
+			full: false,
+			timeout: 0,
+			ipv6: false,
+			port: 0,
+			sweep_ports: '',
+			nodes: '',
+			countries: '',
+			exclude_nodes: '',
+			exclude_countries: '',
+			targets: '',
+			gen_i1: '',
+			i1_sni: '',
+			gen_junk: false,
+			jc: 0,
+			jmin: 0,
+			jmax: 0,
+			i1: '',
+			masque_sni: '',
+			masque_attempts: 0
+		},
+		call: function(req) {
+			const cfg = get_config();
+			const log_err = (msg) => {
+				command(`echo "$(date '+%Y-%m-%d %H:%M:%S') [rpcd] ERROR: ${replace(msg, '"', '\\"')}" >> /var/log/warpscout.log 2>/dev/null`);
+				command(`logger -t warpscout ${shellquote('ERROR: ' + msg)} 2>/dev/null`);
+			};
+
+			// 0. Pre-flight checks with explicit logging
+			const bin_st = stat(cfg.binary);
+			if (!bin_st) {
+				const msg = 'warpscout binary not found at ' + cfg.binary;
+				log_err(msg);
+				return { success: false, error: msg };
+			}
+			const acc_st = stat(cfg.account);
+			if (!acc_st) {
+				const msg = 'WARP account file not found at ' + cfg.account + '. Please register an account first.';
+				log_err(msg);
+				return { success: false, error: msg };
+			}
+
+			// 1. Check if scan is already running
+			const state = read_json('/var/run/warpscout/state.json');
+			if (state?.job?.status == 'running') {
+				const pid = state.job.pid;
+				if (pid && command(`kill -0 ${pid} 2>/dev/null && echo "alive"`) == 'alive') {
+					const msg = 'A scan job is already running (PID ' + pid + ')';
+					log_err(msg);
+					return { success: false, error: msg };
+				}
+			}
+
+			// 2. Build flags
+			let flags = [];
+			const p = req.args || {};
+			const proto = (p.proto && length(p.proto)) ? p.proto : 'awg';
+
+			push(flags, `-p ${shellquote(proto)}`);
+			if (p.tun_ping) push(flags, '-P');
+			if (p.speed) {
+				push(flags, '--speed');
+				if (p.best_by && length(p.best_by)) push(flags, `--best-by ${shellquote(p.best_by)}`);
+			}
+			if (p.full) {
+				push(flags, '-f');
+			} else if (p.sample && int(p.sample) > 0) {
+				push(flags, `-n ${int(p.sample)}`);
+			}
+			if (p.timeout && int(p.timeout) > 0) push(flags, `-t ${int(p.timeout)}`);
+			if (p.ipv6) push(flags, '-6');
+			if (p.port && int(p.port) > 0) push(flags, `--port ${int(p.port)}`);
+			if (p.sweep_ports && length(p.sweep_ports)) push(flags, `--sweep-ports ${shellquote(p.sweep_ports)}`);
+
+			if (p.nodes && length(trim(p.nodes))) {
+				for (let n in split(trim(p.nodes), /\s+/)) push(flags, `--node ${shellquote(n)}`);
+			}
+			if (p.exclude_nodes && length(trim(p.exclude_nodes))) {
+				for (let n in split(trim(p.exclude_nodes), /\s+/)) push(flags, `--exclude-node ${shellquote(n)}`);
+			}
+			if (p.countries && length(trim(p.countries))) {
+				for (let c in split(trim(p.countries), /\s+/)) push(flags, `--country ${shellquote(c)}`);
+			}
+			if (p.exclude_countries && length(trim(p.exclude_countries))) {
+				for (let c in split(trim(p.exclude_countries), /\s+/)) push(flags, `--exclude-country ${shellquote(c)}`);
+			}
+			if (p.targets && length(trim(p.targets))) {
+				push(flags, `--target ${shellquote(trim(p.targets))}`);
+			}
+
+			// Protocol-specific flags
+			if (proto == 'awg') {
+				if (p.gen_junk) push(flags, '--gen-junk');
+				if (p.gen_i1 && length(p.gen_i1)) push(flags, `--gen-i1 ${shellquote(p.gen_i1)}`);
+				if (p.i1_sni && length(trim(p.i1_sni))) push(flags, `--i1-sni ${shellquote(trim(p.i1_sni))}`);
+				if (p.jc && int(p.jc) > 0) push(flags, `--jc ${int(p.jc)}`);
+				if (p.jmin && int(p.jmin) > 0) push(flags, `--jmin ${int(p.jmin)}`);
+				if (p.jmax && int(p.jmax) > 0) push(flags, `--jmax ${int(p.jmax)}`);
+				if (p.i1 && length(trim(p.i1))) push(flags, `--i1 ${shellquote(trim(p.i1))}`);
+			} else if (proto == 'masque' || proto == 'masque-h2') {
+				if (p.masque_sni && length(trim(p.masque_sni))) push(flags, `--masque-sni ${shellquote(trim(p.masque_sni))}`);
+				if (p.masque_attempts && int(p.masque_attempts) > 0) push(flags, `--masque-attempts ${int(p.masque_attempts)}`);
+			}
+
+			const flag_str = join(' ', flags);
+			command(`echo "$(date '+%Y-%m-%d %H:%M:%S') [rpcd] Triggering scan: ${replace(flag_str, '"', '\\"')}" >> /var/log/warpscout.log 2>/dev/null`);
+			command(`logger -t warpscout ${shellquote('Triggering scan: ' + flag_str)} 2>/dev/null`);
+
+			const runner_cmd = `/usr/libexec/warpscout/run-scan.sh --start ${flag_str} >/dev/null 2>&1 &`;
+			command(runner_cmd);
+
+			return {
+				success: true,
+				message: 'Scan triggered',
+				cmd: flag_str
+			};
+		}
+	},
+
+	getScanProfiles: {
+		call: function(req) {
+			const uci = cursor();
+			const profiles = [];
+			uci.foreach('warpscout', 'scanprofile', (s) => {
+				push(profiles, {
+					name: s['.name'],
+					proto: s.proto || 'awg',
+					tun_ping: (s.tun_ping != '0'),
+					speed: (s.speed == '1'),
+					best_by: s.best_by || 'ping',
+					sample: int(s.sample || 5),
+					full: (s.full == '1'),
+					timeout: int(s.timeout || 2),
+					ipv6: (s.ipv6 == '1'),
+					port: s.port ? int(s.port) : null,
+					sweep_ports: s.sweep_ports || '',
+					nodes: s.nodes || '',
+					countries: s.countries || '',
+					exclude_nodes: s.exclude_nodes || '',
+					exclude_countries: s.exclude_countries || '',
+					targets: s.targets || '',
+					gen_junk: (s.gen_junk == '1'),
+					gen_i1: s.gen_i1 || '',
+					i1_sni: s.i1_sni || '',
+					jc: s.jc ? int(s.jc) : null,
+					jmin: s.jmin ? int(s.jmin) : null,
+					jmax: s.jmax ? int(s.jmax) : null,
+					i1: s.i1 || '',
+					masque_sni: s.masque_sni || '',
+					masque_attempts: s.masque_attempts ? int(s.masque_attempts) : null
+				});
+			});
+			uci.unload('warpscout');
+			return { profiles: profiles };
+		}
+	},
+
+	saveScanProfile: {
+		args: {
+			name: '',
+			proto: '',
+			tun_ping: false,
+			speed: false,
+			best_by: '',
+			sample: 0,
+			full: false,
+			timeout: 0,
+			ipv6: false,
+			port: 0,
+			sweep_ports: '',
+			nodes: '',
+			countries: '',
+			exclude_nodes: '',
+			exclude_countries: '',
+			targets: '',
+			gen_i1: '',
+			i1_sni: '',
+			gen_junk: false,
+			jc: 0,
+			jmin: 0,
+			jmax: 0,
+			i1: '',
+			masque_sni: '',
+			masque_attempts: 0
+		},
+		call: function(req) {
+			const p = req.args || {};
+			const name = trim(p.name || '');
+			if (!match(name, /^[a-zA-Z0-9_-]{1,32}$/)) {
+				return { success: false, error: 'Profile name must be 1-32 alphanumeric/underscore/dash characters' };
+			}
+
+			const uci = cursor();
+			if (!uci.get('warpscout', name)) {
+				uci.set('warpscout', name, 'scanprofile');
+			}
+
+			uci.set('warpscout', name, 'proto', p.proto || 'awg');
+			uci.set('warpscout', name, 'tun_ping', p.tun_ping ? '1' : '0');
+			uci.set('warpscout', name, 'speed', p.speed ? '1' : '0');
+			uci.set('warpscout', name, 'best_by', p.best_by || 'ping');
+			uci.set('warpscout', name, 'sample', '' + (int(p.sample) || 5));
+			uci.set('warpscout', name, 'full', p.full ? '1' : '0');
+			uci.set('warpscout', name, 'timeout', '' + (int(p.timeout) || 2));
+			uci.set('warpscout', name, 'ipv6', p.ipv6 ? '1' : '0');
+			uci.set('warpscout', name, 'port', (p.port && int(p.port) > 0) ? ('' + int(p.port)) : '');
+			uci.set('warpscout', name, 'sweep_ports', p.sweep_ports || '');
+			uci.set('warpscout', name, 'nodes', p.nodes || '');
+			uci.set('warpscout', name, 'countries', p.countries || '');
+			uci.set('warpscout', name, 'exclude_nodes', p.exclude_nodes || '');
+			uci.set('warpscout', name, 'exclude_countries', p.exclude_countries || '');
+			uci.set('warpscout', name, 'targets', p.targets || '');
+			uci.set('warpscout', name, 'gen_junk', p.gen_junk ? '1' : '0');
+			uci.set('warpscout', name, 'gen_i1', p.gen_i1 || '');
+			uci.set('warpscout', name, 'i1_sni', p.i1_sni || '');
+			uci.set('warpscout', name, 'jc', (p.jc && int(p.jc) > 0) ? ('' + int(p.jc)) : '');
+			uci.set('warpscout', name, 'jmin', (p.jmin && int(p.jmin) > 0) ? ('' + int(p.jmin)) : '');
+			uci.set('warpscout', name, 'jmax', (p.jmax && int(p.jmax) > 0) ? ('' + int(p.jmax)) : '');
+			uci.set('warpscout', name, 'i1', p.i1 || '');
+			uci.set('warpscout', name, 'masque_sni', p.masque_sni || '');
+			uci.set('warpscout', name, 'masque_attempts', (p.masque_attempts && int(p.masque_attempts) > 0) ? ('' + int(p.masque_attempts)) : '');
+
+			uci.commit('warpscout');
+			return { success: true, name: name };
+		}
+	},
+
+	deleteScanProfile: {
+		args: {
+			name: ''
+		},
+		call: function(req) {
+			const name = trim(req.args?.name || '');
+			if (!name || name == 'default') {
+				return { success: false, error: 'Cannot delete default profile' };
+			}
+			const uci = cursor();
+			if (uci.get('warpscout', name) != 'scanprofile') {
+				return { success: false, error: 'Scan profile not found: ' + name };
+			}
+			uci.delete('warpscout', name);
+			uci.commit('warpscout');
+			return { success: true, name: name };
+		}
+	},
+
+	runScheduledJob: {
+		args: {
+			job: ''
+		},
+		call: function(req) {
+			const job_name = trim(req.args?.job || 'nightly');
+			if (!match(job_name, /^[a-zA-Z0-9_-]{1,32}$/)) {
+				return { success: false, error: 'Invalid job name' };
+			}
+			const cfg = get_config();
+			if (!stat(cfg.binary)) {
+				return { success: false, error: 'warpscout binary not found at ' + cfg.binary };
+			}
+			if (!stat(cfg.account)) {
+				return { success: false, error: 'WARP account file not found at ' + cfg.account };
+			}
+			command(`logger -t warpscout ${shellquote('Manual run of scheduled job: ' + job_name)} 2>/dev/null`);
+			command(`/usr/libexec/warpscout/run-scan.sh --cron ${shellquote(job_name)} --no-jitter >/dev/null 2>&1 &`);
+			return { success: true, job: job_name };
+		}
+	},
+
+	cancelScan: {
+		call: function(req) {
+			const res = command('/usr/libexec/warpscout/run-scan.sh --cancel 2>&1');
+			return { success: true, message: res };
+		}
+	},
+
+	getScanStatus: {
+		call: function(req) {
+			const state = read_json('/var/run/warpscout/state.json') || {};
+			let tail_log = '';
+
+			if (state.job?.log) {
+				tail_log = command(`tail -n 15 ${shellquote(state.job.log)} 2>/dev/null`) || '';
+			}
+
+			// If job is running, check if process actually still lives
+			let is_alive = false;
+			if (state.job?.status == 'running' && state.job?.pid) {
+				is_alive = (command(`kill -0 ${state.job.pid} 2>/dev/null && echo "alive"`) == 'alive');
+				if (!is_alive) {
+					state.job.status = 'terminated';
+				}
+			}
+
+			return {
+				job: state.job || null,
+				tail: tail_log,
+				last_scan: state.last_scan || null
+			};
+		}
+	},
+
+	registerAccount: {
+		args: {
+			fresh: false,
+			relay: ''
+		},
+		call: function(req) {
+			const cfg = get_config();
+
+			const bin_stat = stat(cfg.binary);
+			if (!bin_stat) {
+				return { success: false, error: 'Binary warpscout not found at ' + cfg.binary };
+			}
+
+			let cmd = `${shellquote(cfg.binary)} register -a ${shellquote(cfg.account)}`;
+			if (req.args?.fresh) {
+				cmd += ' --fresh';
+			}
+			if (req.args?.relay && length(req.args.relay)) {
+				cmd += ` --relay ${shellquote(req.args.relay)}`;
+			}
+
+			// Ensure target directory exists and is secured
+			command(`mkdir -p $(dirname ${shellquote(cfg.account)}) && chmod 0700 $(dirname ${shellquote(cfg.account)})`);
+
+			const out = command(`${cmd} 2>&1`);
+			const res_stat = stat(cfg.account);
+
+			if (res_stat && res_stat.type == 'file') {
+				command(`chmod 0600 ${shellquote(cfg.account)}`);
+				return {
+					success: true,
+					output: out,
+					account_path: cfg.account
+				};
+			}
+
+			return {
+				success: false,
+				error: 'Registration failed: ' + out
+			};
+		}
+	},
+
+	getResults: {
+		call: function(req) {
+			let state = read_json('/var/run/warpscout/state.json');
+			let last_scan = state?.last_scan;
+			let job = state?.job;
+
+			// Fallback to persistent artifact directory if state.json is empty (e.g. after reboot)
+			if (!last_scan) {
+				const latest_dir = command('ls -1dt /etc/warpscout/artifacts/20* 2>/dev/null | head -n 1');
+				if (latest_dir && length(latest_dir)) {
+					const report_file = `${latest_dir}/report.txt`;
+					const conf_file = `${latest_dir}/tunnel.conf`;
+					const report_content = command(`/usr/libexec/warpscout/report-parse.uc ${shellquote(report_file)} 2>/dev/null`);
+					if (report_content) {
+						try {
+							last_scan = json(report_content);
+							job = {
+								id: substr(latest_dir, rindex(latest_dir, '/') + 1),
+								status: 'ok',
+								report: report_file,
+								conf: conf_file
+							};
+						} catch (e) {}
+					}
+				}
+			}
+
+			return {
+				last_scan: last_scan || null,
+				job: job || null
+			};
+		}
+	},
+
+	getLastConfig: {
+		call: function(req) {
+			let conf_file = null;
+			const state = read_json('/var/run/warpscout/state.json');
+			if (state?.job?.conf && stat(state.job.conf)) {
+				conf_file = state.job.conf;
+			} else {
+				const latest_dir = command('ls -1dt /etc/warpscout/artifacts/20* 2>/dev/null | head -n 1');
+				if (latest_dir && length(latest_dir)) {
+					conf_file = `${latest_dir}/tunnel.conf`;
+				}
+			}
+
+			if (conf_file && stat(conf_file)) {
+				const content = command(`cat ${shellquote(conf_file)} 2>/dev/null`);
+				return {
+					path: conf_file,
+					content: content
+				};
+			}
+
+			return { error: 'No generated tunnel configuration found' };
+		}
+	},
+
+	getTunnels: {
+		call: function(req) {
+			const uci = cursor();
+			const tunnels = [];
+			const caps = command('/usr/libexec/warpscout/capabilities.sh 2>/dev/null');
+			let parsed_caps = null;
+			if (caps) {
+				try { parsed_caps = json(caps); } catch (e) {}
+			}
+
+			// Build endpoint -> node/country lookup from state.json
+			const ep_map = {};
+			const state = read_json('/var/run/warpscout/state.json');
+			if (state?.last_scan) {
+				for (let it in (state.last_scan.items || [])) {
+					if (it.endpoint) ep_map[it.endpoint] = it;
+				}
+				for (let b in (state.last_scan.best_per_node || [])) {
+					if (b.endpoint && !ep_map[b.endpoint]) ep_map[b.endpoint] = b;
+				}
+			}
+
+			// 1. Gather all interfaces with proto wireguard or amneziawg
+			uci.foreach('network', 'interface', (s) => {
+				const iface = s['.name'];
+				const proto = s.proto;
+				if (proto != 'wireguard' && proto != 'amneziawg') return;
+
+				const peer_sec = `${proto}_${iface}`;
+				const ep_host = uci.get('network', peer_sec, 'endpoint_host') || '';
+				const ep_port = uci.get('network', peer_sec, 'endpoint_port') || '';
+				const endpoint = (ep_host && ep_port) ? `${ep_host}:${ep_port}` : '';
+				const allowed_ips = uci.get('network', peer_sec, 'allowed_ips') || [];
+
+				// Check capability readiness
+				const cap_ready = (proto == 'wireguard') ? parsed_caps?.wg?.ready : parsed_caps?.awg?.ready;
+
+				// Check interface status
+				const show_bin = (proto == 'wireguard') ? 'wg' : 'awg';
+				let hs_ts = 0;
+				let rx = 0;
+				let tx = 0;
+
+				const hs_out = command(`${show_bin} show ${shellquote(iface)} latest-handshakes 2>/dev/null`);
+				if (hs_out) {
+					const hs_parts = split(hs_out, /\s+/);
+					if (length(hs_parts) >= 2) hs_ts = int(hs_parts[1]);
+				}
+
+				const tf_out = command(`${show_bin} show ${shellquote(iface)} transfer 2>/dev/null`);
+				if (tf_out) {
+					const tf_parts = split(tf_out, /\s+/);
+					if (length(tf_parts) >= 3) {
+						rx = int(tf_parts[1]);
+						tx = int(tf_parts[2]);
+					}
+				}
+
+				// Check firewall zone
+				let iface_zone = 'unassigned';
+				uci.foreach('firewall', 'zone', (z) => {
+					let net_list = z.network;
+					if (type(net_list) == 'array' && index(net_list, iface) >= 0) {
+						iface_zone = z.name;
+					} else if (net_list == iface) {
+						iface_zone = z.name;
+					}
+				});
+
+				// Check if link is up
+				const ip_link_out = command(`ip link show ${shellquote(iface)} 2>/dev/null`);
+				const is_up = (index(ip_link_out, 'state UP') >= 0 || index(ip_link_out, 'UP,') >= 0 || (index(ip_link_out, '<UP') >= 0));
+
+				const ep_info = ep_map[endpoint] || {};
+				const cur_node = ep_info.node || uci.get('warpscout', iface, 'last_node') || '';
+				const cur_seen_as = ep_info.seen_as || uci.get('warpscout', iface, 'last_seen_as') || '';
+				const cur_loc = ep_info.node_location || '';
+				const target_node = uci.get('warpscout', iface, 'target_node') || '';
+
+				push(tunnels, {
+					iface: iface,
+					proto: proto,
+					up: !!is_up,
+					endpoint: endpoint,
+					node: cur_node,
+					seen_as: cur_seen_as,
+					node_location: cur_loc,
+					target_node: target_node,
+					latest_handshake: hs_ts,
+					handshake_age: (hs_ts > 0) ? (time() - hs_ts) : null,
+					transfer_rx: rx,
+					transfer_tx: tx,
+					allowed_ips: allowed_ips,
+					zone: iface_zone,
+					capability_ready: !!cap_ready,
+					managed: (uci.get('warpscout', iface, 'managed') == '1')
+				});
+			});
+
+			return { tunnels: tunnels };
+		}
+	},
+
+	applyTunnel: {
+		args: {
+			iface: '',
+			proto: '',
+			zone: '',
+			route_allowed_ips: true,
+			mtu: 0,
+			dns: '',
+			verify: true,
+			conf_content: '',
+			managed: true,
+			target_node: ''
+		},
+		call: function(req) {
+			const engine = loadfile('/usr/libexec/warpscout/conf-to-uci.uc')();
+			if (!engine) {
+				return { success: false, error: 'Failed to load conf-to-uci engine' };
+			}
+
+			const p = req.args || {};
+			const proto = p.proto || 'amneziawg';
+			const iface = p.iface || (proto == 'wireguard' ? 'wswg0' : 'wsawg0');
+
+			// Capability Gate
+			const caps = command('/usr/libexec/warpscout/capabilities.sh 2>/dev/null');
+			let parsed_caps = null;
+			if (caps) {
+				try { parsed_caps = json(caps); } catch (e) {}
+			}
+
+			if (proto == 'wireguard' && !parsed_caps?.wg?.ready) {
+				return {
+					success: false,
+					error: 'WireGuard kernel or tools missing. Check Overview or Diagnostics in Settings.'
+				};
+			}
+			if (proto == 'amneziawg' && !parsed_caps?.awg?.ready) {
+				return {
+					success: false,
+					error: 'AmneziaWG kernel or tools missing. Check Overview or Diagnostics in Settings.'
+				};
+			}
+
+			// If conf_content is not explicitly passed, resolve from latest generated artifact
+			let conf_content = p.conf_content;
+			if (!conf_content || !length(conf_content)) {
+				const latest_dir = command('ls -1dt /etc/warpscout/artifacts/20* 2>/dev/null | head -n 1');
+				if (latest_dir) {
+					conf_content = command(`cat ${latest_dir}/tunnel.conf 2>/dev/null`);
+				}
+			}
+
+			if (!conf_content || !length(conf_content)) {
+				return { success: false, error: 'No tunnel configuration available. Please run a scan first.' };
+			}
+
+			// Resolve node / seen_as from last_scan if available
+			const parsed_preview = engine.parse_conf(conf_content);
+			const preview_ep = parsed_preview?.peer?.Endpoint || '';
+			let last_node = '';
+			let last_seen_as = '';
+			const state = read_json('/var/run/warpscout/state.json');
+			if (preview_ep && state?.last_scan) {
+				for (let it in (state.last_scan.items || [])) {
+					if (it.endpoint == preview_ep) {
+						last_node = it.node || '';
+						last_seen_as = it.seen_as || '';
+						break;
+					}
+				}
+			}
+
+			const apply_res = engine.apply_tunnel({
+				conf_content: conf_content,
+				iface: iface,
+				proto: proto,
+				zone: p.zone || 'wan',
+				route_allowed_ips: (p.route_allowed_ips !== false),
+				mtu: p.mtu || 1280,
+				dns: p.dns,
+				managed: (p.managed !== false),
+				target_node: p.target_node || '',
+				last_node: last_node,
+				last_seen_as: last_seen_as
+			});
+
+			if (!apply_res.success) {
+				return apply_res;
+			}
+
+			// Verify handshake if requested
+			let hs_res = { handshake: false };
+			if (p.verify !== false) {
+				hs_res = engine.verify_handshake(iface, proto, 15);
+			}
+
+			return {
+				success: true,
+				iface: iface,
+				proto: proto,
+				endpoint: apply_res.endpoint,
+				handshake: hs_res.handshake,
+				handshake_detail: hs_res
+			};
+		}
+	},
+
+	updateEndpoint: {
+		args: {
+			iface: '',
+			endpoint: ''
+		},
+		call: function(req) {
+			const engine = loadfile('/usr/libexec/warpscout/conf-to-uci.uc')();
+			const iface = req.args?.iface;
+			const endpoint = req.args?.endpoint;
+			let node = null;
+			let seen_as = null;
+			const state = read_json('/var/run/warpscout/state.json');
+			if (endpoint && state?.last_scan) {
+				for (let it in (state.last_scan.items || [])) {
+					if (it.endpoint == endpoint) {
+						node = it.node || null;
+						seen_as = it.seen_as || null;
+						break;
+					}
+				}
+			}
+			return engine.update_endpoint(iface, endpoint, node, seen_as);
+		}
+	},
+
+	setTunnelConfig: {
+		args: {
+			iface: '',
+			managed: false,
+			target_node: ''
+		},
+		call: function(req) {
+			const iface = trim(req.args?.iface || '');
+			if (!match(iface, /^[a-zA-Z0-9_-]{1,15}$/)) {
+				return { success: false, error: 'Invalid interface name' };
+			}
+			const uci = cursor();
+			const proto = uci.get('network', iface, 'proto');
+			if (!proto) {
+				return { success: false, error: 'Interface ' + iface + ' not found in network config' };
+			}
+			if (!uci.get('warpscout', iface)) {
+				uci.set('warpscout', iface, 'tunnel');
+				uci.set('warpscout', iface, 'iface', iface);
+				uci.set('warpscout', iface, 'proto', proto);
+			}
+			uci.set('warpscout', iface, 'managed', req.args?.managed ? '1' : '0');
+			uci.set('warpscout', iface, 'target_node', trim(req.args?.target_node || ''));
+			uci.commit('warpscout');
+			return {
+				success: true,
+				iface: iface,
+				managed: !!req.args?.managed,
+				target_node: trim(req.args?.target_node || '')
+			};
+		}
+	},
+
+	deleteTunnel: {
+		args: {
+			iface: ''
+		},
+		call: function(req) {
+			const engine = loadfile('/usr/libexec/warpscout/conf-to-uci.uc')();
+			const iface = req.args?.iface;
+			if (!iface) {
+				return { success: false, error: 'Interface required' };
+			}
+			return engine.delete_tunnel(iface);
+		}
+	},
+
+	getSchedule: {
+		call: function(req) {
+			const uci = cursor();
+			const jobs = [];
+			uci.foreach('warpscout', 'job', (s) => {
+				push(jobs, {
+					name: s['.name'],
+					enabled: (s.enabled == '1'),
+					profile: s.profile || 'default',
+					cron: s.cron || '0 4 * * *',
+					action: s.action || 'update_tunnels',
+					catchup: (s.catchup == '1'),
+					jitter: int(s.jitter || 0)
+				});
+			});
+
+			const profiles = [];
+			uci.foreach('warpscout', 'scanprofile', (s) => {
+				push(profiles, s['.name']);
+			});
+			uci.unload('warpscout');
+
+			// Check crond status
+			const cron_init = stat('/etc/init.d/cron');
+			const cron_installed = !!cron_init;
+			const cron_ps = command('ps | grep [c]rond');
+			const cron_running = !!(cron_ps && length(cron_ps));
+
+			// Read crontab managed content
+			let crontab_block = '';
+			const crontab_raw = command('cat /etc/crontabs/root 2>/dev/null');
+			if (crontab_raw) {
+				const b_idx = index(crontab_raw, '# BEGIN WARPSCOUT MANAGED BLOCK');
+				const e_idx = index(crontab_raw, '# END WARPSCOUT MANAGED BLOCK');
+				if (b_idx >= 0 && e_idx >= b_idx) {
+					crontab_block = trim(substr(crontab_raw, b_idx, e_idx - b_idx + length('# END WARPSCOUT MANAGED BLOCK')));
+				}
+			}
+
+			const state = read_json('/var/run/warpscout/state.json');
+
+			return {
+				jobs: jobs,
+				profiles: profiles,
+				cron_installed: cron_installed,
+				cron_running: cron_running,
+				crontab_block: crontab_block,
+				last_job: state?.job || null
+			};
+		}
+	},
+
+	setSchedule: {
+		args: {
+			job: '',
+			enabled: false,
+			profile: '',
+			cron: '',
+			action: '',
+			jitter: 0
+		},
+		call: function(req) {
+			const p = req.args || {};
+			const job_name = p.job || 'nightly';
+
+			const uci = cursor();
+			if (!uci.get('warpscout', job_name)) {
+				uci.set('warpscout', job_name, 'job');
+			}
+
+			uci.set('warpscout', job_name, 'enabled', p.enabled ? '1' : '0');
+			if (p.profile) uci.set('warpscout', job_name, 'profile', p.profile);
+			if (p.cron) uci.set('warpscout', job_name, 'cron', p.cron);
+			if (p.action) uci.set('warpscout', job_name, 'action', p.action);
+			if (p.jitter != null) uci.set('warpscout', job_name, 'jitter', '' + p.jitter);
+			uci.commit('warpscout');
+
+			const sync_out = command('/usr/libexec/warpscout/cron-sync.sh 2>&1');
+
+			return {
+				success: true,
+				job: job_name,
+				sync_output: sync_out
+			};
+		}
+	},
+
+	getSocksStatus: {
+		call: function(req) {
+			const uci = cursor();
+			const enabled = (uci.get('warpscout', 'socks', 'enabled') == '1');
+			const endpoint = uci.get('warpscout', 'socks', 'endpoint') || '';
+			const proto = uci.get('warpscout', 'socks', 'proto') || 'awg';
+			const listen = uci.get('warpscout', 'socks', 'listen') || '127.0.0.1';
+			const port = uci.get('warpscout', 'socks', 'port') || '1080';
+			const allow_lan = (uci.get('warpscout', 'socks', 'allow_lan') == '1');
+			uci.unload('warpscout');
+
+			// Check process status
+			const ps_out = command('ps | grep "[w]arpscout socks"');
+			let running = false;
+			let pid = null;
+			if (ps_out && length(ps_out)) {
+				running = true;
+				const parts = split(trim(ps_out), /\s+/);
+				if (length(parts) >= 1) {
+					pid = int(parts[0]);
+				}
+			}
+
+			// Check if listening
+			let listening = false;
+			const netstat_out = command(`netstat -tln 2>/dev/null | grep ":${port} "`);
+			if (netstat_out && length(netstat_out)) {
+				listening = true;
+			}
+
+			// Resolve best endpoint from last scan or artifacts for 1-click apply
+			let best_endpoint = null;
+			let best_node = null;
+			let best_seen_as = null;
+			const state = read_json('/var/run/warpscout/state.json');
+			if (state?.last_scan?.best) {
+				best_endpoint = state.last_scan.best;
+				best_node = state.last_scan.best_node;
+				best_seen_as = state.last_scan.best_seen_as;
+			} else {
+				// Fallback to latest artifact report
+				const latest_dir = command('ls -1dt /etc/warpscout/artifacts/20* 2>/dev/null | head -n 1');
+				if (latest_dir) {
+					const parser = loadfile('/usr/libexec/warpscout/report-parse.uc')();
+					const rep_file = open(`${latest_dir}/report.txt`, 'r');
+					if (rep_file) {
+						const rep_content = rep_file.read('all');
+						rep_file.close();
+						const parsed = parser.parse_report(rep_content);
+						if (parsed?.best) {
+							best_endpoint = parsed.best;
+							best_node = parsed.best_node;
+							best_seen_as = parsed.best_seen_as;
+						}
+					}
+				}
+			}
+
+			return {
+				enabled: enabled,
+				endpoint: endpoint,
+				proto: proto,
+				listen: listen,
+				port: port,
+				allow_lan: allow_lan,
+				running: running,
+				pid: pid,
+				listening: listening,
+				best_endpoint: best_endpoint,
+				best_node: best_node,
+				best_seen_as: best_seen_as
+			};
+		}
+	},
+
+	setSocksConfig: {
+		args: {
+			enabled: false,
+			endpoint: '',
+			proto: '',
+			listen: '',
+			port: 0,
+			allow_lan: false
+		},
+		call: function(req) {
+			const p = req.args || {};
+			const uci = cursor();
+
+			if (!uci.get('warpscout', 'socks')) {
+				uci.set('warpscout', 'socks', 'socks');
+			}
+
+			const enabled = !!p.enabled;
+			uci.set('warpscout', 'socks', 'enabled', enabled ? '1' : '0');
+			if (p.endpoint) uci.set('warpscout', 'socks', 'endpoint', p.endpoint);
+			if (p.proto) uci.set('warpscout', 'socks', 'proto', p.proto);
+
+			const allow_lan = !!p.allow_lan;
+			uci.set('warpscout', 'socks', 'allow_lan', allow_lan ? '1' : '0');
+
+			const listen = allow_lan ? '0.0.0.0' : (p.listen || '127.0.0.1');
+			uci.set('warpscout', 'socks', 'listen', listen);
+
+			const port = '' + (p.port || '1080');
+			uci.set('warpscout', 'socks', 'port', port);
+
+			uci.commit('warpscout');
+
+			// Service control
+			if (enabled) {
+				command('/etc/init.d/warpscout-socks enable >/dev/null 2>&1');
+				command('/etc/init.d/warpscout-socks restart >/dev/null 2>&1 &');
+			} else {
+				command('/etc/init.d/warpscout-socks disable >/dev/null 2>&1');
+				command('/etc/init.d/warpscout-socks stop >/dev/null 2>&1 &');
+			}
+
+			return {
+				success: true,
+				enabled: enabled,
+				endpoint: p.endpoint,
+				listen: listen,
+				port: port
+			};
+		}
+	},
+
+	testSocksProxy: {
+		args: {
+			host: '',
+			port: 0
+		},
+		call: function(req) {
+			const host = req.args?.host || '127.0.0.1';
+			const port = req.args?.port || 1080;
+
+			// 1. First test TCP reachability via netstat and nc
+			let is_listening = false;
+			const netstat_chk = command(`netstat -tln 2>/dev/null | grep ":${int(port)} "`);
+			if (netstat_chk && length(netstat_chk)) {
+				is_listening = true;
+			} else {
+				const nc_test = command(`nc ${shellquote(host)} ${int(port)} </dev/null 2>&1`);
+				if (!nc_test || index(nc_test, 'refused') == -1) {
+					is_listening = true;
+				}
+			}
+
+			if (!is_listening) {
+				const log_tail = command("logread 2>/dev/null | grep -iE 'warpscout-socks|warpscout' | tail -n 6") || '';
+				return {
+					success: false,
+					listening: false,
+					error: 'SOCKS5 proxy port is not reachable or process is down',
+					log_tail: log_tail
+				};
+			}
+
+			// 2. If curl is available, attempt real cloudflare trace
+			const curl_path = command('which curl 2>/dev/null');
+			if (curl_path && length(curl_path)) {
+				const trace_cmd = `curl -s -m 5 -x socks5h://${host}:${port} https://cloudflare.com/cdn-cgi/trace 2>&1`;
+				const trace_out = command(trace_cmd);
+				if (trace_out && index(trace_out, 'colo=') >= 0) {
+					return {
+						success: true,
+						listening: true,
+						curl: true,
+						trace: trace_out
+					};
+				} else {
+					return {
+						success: false,
+						listening: true,
+						curl: true,
+						error: trace_out || 'Trace request timed out or was blocked'
+					};
+				}
+			}
+
+			return {
+				success: true,
+				listening: true,
+				curl: false,
+				message: 'Proxy port is open and accepting TCP connections'
+			};
+		}
+	},
+
+	getSettings: {
+		call: function(req) {
+			const uci = cursor();
+			const res = {
+				binary: uci.get('warpscout', 'main', 'binary') || '/usr/bin/warpscout',
+				account: uci.get('warpscout', 'main', 'account') || '/etc/warpscout/account.json',
+				jobs: int(uci.get('warpscout', 'main', 'jobs') || 4),
+				caps_ttl: int(uci.get('warpscout', 'main', 'caps_ttl') || 60),
+				auto_update: (uci.get('warpscout', 'main', 'auto_update') == '1'),
+				update_url: uci.get('warpscout', 'main', 'update_url') || ''
+			};
+			uci.unload('warpscout');
+			return res;
+		}
+	},
+
+	setSettings: {
+		args: {
+			binary: '',
+			account: '',
+			jobs: 0,
+			caps_ttl: 0,
+			auto_update: false,
+			update_url: ''
+		},
+		call: function(req) {
+			const p = req.args || {};
+			const uci = cursor();
+
+			if (!uci.get('warpscout', 'main')) {
+				uci.set('warpscout', 'main', 'warpscout');
+			}
+
+			if (p.binary && length(p.binary)) uci.set('warpscout', 'main', 'binary', p.binary);
+			if (p.account && length(p.account)) uci.set('warpscout', 'main', 'account', p.account);
+			if (p.jobs != null && int(p.jobs) > 0) uci.set('warpscout', 'main', 'jobs', '' + int(p.jobs));
+			if (p.caps_ttl != null && int(p.caps_ttl) >= 0) uci.set('warpscout', 'main', 'caps_ttl', '' + int(p.caps_ttl));
+			uci.set('warpscout', 'main', 'auto_update', p.auto_update ? '1' : '0');
+			if (p.update_url != null) uci.set('warpscout', 'main', 'update_url', p.update_url);
+
+			uci.commit('warpscout');
+			return { success: true };
+		}
+	},
+
+	getLogs: {
+		args: {
+			lines: 0
+		},
+		call: function(req) {
+			const log_path = '/var/log/warpscout.log';
+			const max_lines = (req.args?.lines && int(req.args.lines) > 0) ? int(req.args.lines) : 200;
+			const capped = (max_lines > 1000) ? 1000 : max_lines;
+
+			const st = stat(log_path);
+			if (!st) {
+				return { exists: false, size: 0, content: '' };
+			}
+
+			const content = command(`tail -n ${capped} ${shellquote(log_path)} 2>/dev/null`) || '';
+			return {
+				exists: true,
+				size: st.size || 0,
+				content: content
+			};
+		}
+	},
+
+	clearLogs: {
+		call: function(req) {
+			const log_path = '/var/log/warpscout.log';
+			const f = open(log_path, 'w');
+			if (!f) {
+				return { success: false, error: 'Failed to open log file for writing' };
+			}
+			f.close();
+			return { success: true };
+		}
+	},
+
+	getDiagnostics: {
+		call: function(req) {
+			const cfg = get_config();
+
+			// 1. System board info
+			let board = null;
+			const board_raw = command('ubus call system board 2>/dev/null');
+			if (board_raw) {
+				try { board = json(board_raw); } catch (e) {}
+			}
+
+			// 2. Binary info
+			const bin_stat = stat(cfg.binary);
+			const bin_installed = !!(bin_stat && (bin_stat.type == 'file' || bin_stat.type == 'link'));
+			const bin_version = bin_installed ? command(`${shellquote(cfg.binary)} version 2>/dev/null`) : null;
+
+			// 3. Storage & RAM
+			const df_out = command('df -h /etc/warpscout /tmp 2>/dev/null');
+			const mem_raw = command('grep -E "^(MemTotal|MemAvailable|MemFree):" /proc/meminfo 2>/dev/null');
+
+			// 4. /dev/net/tun
+			const tun_stat = stat('/dev/net/tun');
+			const has_tun = !!tun_stat;
+
+			// 5. Full capabilities
+			let caps = null;
+			const caps_raw = command('/usr/libexec/warpscout/capabilities.sh 2>/dev/null');
+			if (caps_raw) {
+				try { caps = json(caps_raw); } catch (e) {}
+			}
+
+			// 6. Sanitized account summary (no secrets)
+			const acc_data = read_json(cfg.account);
+			const acc_summary = acc_data ? {
+				exists: true,
+				id: acc_data.id || null,
+				ipv4: acc_data.ipv4 || null,
+				ipv6: acc_data.ipv6 || null,
+				key_mask: mask_key(acc_data.private_key)
+			} : { exists: false };
+
+			// 7. Recent netifd / tunnel / warpscout syslog
+			const syslog_tail = command("logread 2>/dev/null | grep -iE 'netifd|wireguard|amneziawg|warpscout' | tail -n 30");
+
+			return {
+				timestamp: time(),
+				board: board,
+				binary: {
+					path: cfg.binary,
+					installed: bin_installed,
+					version: bin_version
+				},
+				has_tun: has_tun,
+				storage: df_out || '',
+				memory: mem_raw || '',
+				capabilities: caps,
+				account: acc_summary,
+				syslog_tail: syslog_tail || ''
+			};
+		}
+	}
+};
+
+return { 'luci.warpscout': methods };
