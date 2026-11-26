@@ -36,8 +36,17 @@ jobs:
               ./scripts/feeds update -a
               ./scripts/feeds install -a
 
+              echo "CONFIG_PACKAGE_luci-app-warpscout=y" >> .config
+              echo "CONFIG_PACKAGE_luci-i18n-warpscout-ru=y" >> .config
+              echo "CONFIG_PACKAGE_liblua=y" >> .config
               make defconfig
-              make package/luci-app-warpscout/compile V=s
+
+              LUA_PKG=$(find package -maxdepth 4 -type d -name lua | head -n 1)
+              if [ -n "$LUA_PKG" ]; then
+                make "${LUA_PKG}/compile" -j"$(nproc)" V=s
+              fi
+
+              make package/luci-app-warpscout/compile -j"$(nproc)" V=s
 
               find bin/packages -type f -name "luci-*warpscout*.ipk" -exec cp -v {} /out/ \;
               ./scripts/ipkg-make-index.sh /out > /out/Packages
@@ -75,8 +84,17 @@ jobs:
               ./scripts/feeds update -a
               ./scripts/feeds install -a
 
+              echo "CONFIG_PACKAGE_luci-app-warpscout=y" >> .config
+              echo "CONFIG_PACKAGE_luci-i18n-warpscout-ru=y" >> .config
+              echo "CONFIG_PACKAGE_liblua=y" >> .config
               make defconfig
-              make package/luci-app-warpscout/compile V=s
+
+              LUA_PKG=$(find package -maxdepth 4 -type d -name lua | head -n 1)
+              if [ -n "$LUA_PKG" ]; then
+                make "${LUA_PKG}/compile" -j"$(nproc)" V=s
+              fi
+
+              make package/luci-app-warpscout/compile -j"$(nproc)" V=s
 
               find bin/packages -type f -name "luci-*warpscout*.apk" -exec cp -v {} /out/ \;
               APK_BIN="$(command -v apk || find staging_dir/host/bin -name apk -type f | head -n 1)"
