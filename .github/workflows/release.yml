@@ -41,7 +41,8 @@ jobs:
               echo "CONFIG_PACKAGE_liblua=y" >> .config
               make defconfig
 
-              LUA_PKG=$(find package -maxdepth 4 -type d -name lua | head -n 1)
+              LUA_PKG=$(find -L package -maxdepth 4 -type d -name lua | head -n 1)
+              echo "Found LUA_PKG=$LUA_PKG"
               if [ -n "$LUA_PKG" ]; then
                 make "${LUA_PKG}/compile" -j"$(nproc)" V=s
               fi
@@ -89,7 +90,8 @@ jobs:
               echo "CONFIG_PACKAGE_liblua=y" >> .config
               make defconfig
 
-              LUA_PKG=$(find package -maxdepth 4 -type d -name lua | head -n 1)
+              LUA_PKG=$(find -L package -maxdepth 4 -type d -name lua | head -n 1)
+              echo "Found LUA_PKG=$LUA_PKG"
               if [ -n "$LUA_PKG" ]; then
                 make "${LUA_PKG}/compile" -j"$(nproc)" V=s
               fi
