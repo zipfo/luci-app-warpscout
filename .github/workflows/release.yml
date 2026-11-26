@@ -33,8 +33,8 @@ jobs:
               mkdir -p package/luci-app-warpscout
               cp -r /src/Makefile /src/htdocs /src/po /src/root package/luci-app-warpscout/
 
-              ./scripts/feeds update luci
-              ./scripts/feeds install -a -p luci
+              ./scripts/feeds update -a
+              ./scripts/feeds install -a
 
               make defconfig
               make package/luci-app-warpscout/compile V=s
@@ -72,8 +72,8 @@ jobs:
               mkdir -p package/luci-app-warpscout
               cp -r /src/Makefile /src/htdocs /src/po /src/root package/luci-app-warpscout/
 
-              ./scripts/feeds update luci
-              ./scripts/feeds install -a -p luci
+              ./scripts/feeds update -a
+              ./scripts/feeds install -a
 
               make defconfig
               make package/luci-app-warpscout/compile V=s
