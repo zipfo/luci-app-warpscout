@@ -33,8 +33,10 @@ jobs:
               mkdir -p package/luci-app-warpscout
               cp -r /src/Makefile /src/htdocs /src/po /src/root package/luci-app-warpscout/
 
-              ./scripts/feeds update -a
-              ./scripts/feeds install -a
+              ./scripts/feeds update base packages luci
+              ./scripts/feeds install -a -p base
+              ./scripts/feeds install -a -p packages
+              ./scripts/feeds install -a -p luci
 
               echo "CONFIG_PACKAGE_luci-app-warpscout=y" >> .config
               echo "CONFIG_PACKAGE_luci-i18n-warpscout-ru=y" >> .config
@@ -50,7 +52,10 @@ jobs:
               make package/luci-app-warpscout/compile -j"$(nproc)" V=s
 
               find bin/packages -type f -name "luci-*warpscout*.ipk" -exec cp -v {} /out/ \;
-              export PATH="$PWD/staging_dir/host/bin:$PATH"
+              mkdir -p /tmp/hostbin
+              printf "#!/bin/sh\nsha256sum \"\$1\" | cut -d\" \" -f1\n" > /tmp/hostbin/sha256
+              chmod +x /tmp/hostbin/sha256
+              export PATH="/tmp/hostbin:$PWD/staging_dir/host/bin:$PATH"
               ./scripts/ipkg-make-index.sh /out > /out/Packages
               gzip -k -f /out/Packages
               ls -la /out
@@ -83,8 +88,10 @@ jobs:
               mkdir -p package/luci-app-warpscout
               cp -r /src/Makefile /src/htdocs /src/po /src/root package/luci-app-warpscout/
 
-              ./scripts/feeds update -a
-              ./scripts/feeds install -a
+              ./scripts/feeds update base packages luci
+              ./scripts/feeds install -a -p base
+              ./scripts/feeds install -a -p packages
+              ./scripts/feeds install -a -p luci
 
               echo "CONFIG_PACKAGE_luci-app-warpscout=y" >> .config
               echo "CONFIG_PACKAGE_luci-i18n-warpscout-ru=y" >> .config
