@@ -419,7 +419,7 @@ return view.extend({
 					]),
 					E('tr', { 'class': 'tr' }, [
 						E('td', { 'class': 'td left' }, _('Route Allowed IPs (Default Route)')),
-						E('td', { 'class': 'td left' }, E('input', { 'type': 'checkbox', 'id': 'new-route-allowed', 'checked': 'checked' }))
+						E('td', { 'class': 'td left' }, E('input', { 'type': 'checkbox', 'id': 'new-route-allowed' }))
 					]),
 					E('tr', { 'class': 'tr' }, [
 						E('td', { 'class': 'td left' }, _('Managed by Scheduler (Auto-Update)')),

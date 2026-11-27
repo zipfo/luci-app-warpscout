@@ -98,7 +98,7 @@ function apply_tunnel(opts) {
 
 	const proto = opts.proto || (opts.iface && index(opts.iface, 'wg') >= 0 && index(opts.iface, 'awg') == -1 ? 'wireguard' : 'amneziawg');
 	const zone_name = opts.zone || 'wan';
-	const route_allowed_ips = opts.route_allowed_ips ?? true;
+	const route_allowed_ips = opts.route_allowed_ips ?? false;
 	const peer_sec_name = `${proto}_${iface}`;
 
 	const uci = cursor();
