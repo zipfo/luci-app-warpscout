@@ -2,6 +2,13 @@
 
 All notable changes to `luci-app-warpscout` will be documented in this file.
 
+## [0.1.1] - 2026-11-27
+
+### Changed
+- **Tunnels**: Disabled `route_allowed_ips` (default route) by default in the UI, `applyTunnel` RPC, and `conf-to-uci.uc` so users explicitly opt in or configure policy routing.
+- **Installer (`install.sh`)**: Improved resilience when unrelated third-party `opkg`/`apk` feeds fail during index refresh, and passed explicit `--repository` to `apk add`.
+- **Documentation**: Streamlined `README.md` to focus on application features, supported targets, and the one-line installer command.
+
 ## [0.1.0] - 2026-11-25
 
 ### Added
