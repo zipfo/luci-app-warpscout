@@ -101,8 +101,9 @@ install_via_opkg() {
 	echo "$FEED_LINE" >> "$FEED_CONF"
 	log "Added custom opkg feed to $FEED_CONF"
 
-	# Try feed update + install; custom feeds without usign key may require direct release fallback
-	if opkg update && opkg install "$PKG_NAME"; then
+	# Update package lists (do not abort if an unrelated third-party feed fails)
+	opkg update || true
+	if opkg install "$PKG_NAME"; then
 		opkg install "$I18N_PKG_NAME" 2>/dev/null || true
 		return 0
 	fi
@@ -129,8 +130,9 @@ install_via_apk() {
 	echo "${FEED_BASE_URL}/apk/packages.adb" > "$REPO_FILE"
 	log "Added custom apk feed to $REPO_FILE"
 
-	if apk update --allow-untrusted && apk add --allow-untrusted "$PKG_NAME"; then
-		apk add --allow-untrusted "$I18N_PKG_NAME" 2>/dev/null || true
+	apk update --allow-untrusted || true
+	if apk add --allow-untrusted --repository "${FEED_BASE_URL}/apk/packages.adb" "$PKG_NAME"; then
+		apk add --allow-untrusted --repository "${FEED_BASE_URL}/apk/packages.adb" "$I18N_PKG_NAME" 2>/dev/null || true
 		return 0
 	fi
 
