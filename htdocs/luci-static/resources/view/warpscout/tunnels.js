@@ -67,6 +67,47 @@ function getQueryParam(name) {
 	return params.get(name) || '';
 }
 
+function buildDefaultIfaceName(tunnels, results, queryNode) {
+	var rawNode = '';
+	var rawCountry = '';
+	var bestPerNode = results?.best_per_node || [];
+	var items = results?.items || [];
+
+	if (queryNode) {
+		var matched = bestPerNode.find(function(b) {
+			return b.node && b.node.toUpperCase() === queryNode;
+		}) || items.find(function(it) {
+			return it.node && it.node.toUpperCase() === queryNode;
+		});
+		rawNode = (matched && matched.node) || queryNode;
+		rawCountry = (matched && matched.seen_as) || '';
+	} else {
+		rawNode = results?.best_node || bestPerNode[0]?.node || items[0]?.node || '';
+		rawCountry = results?.best_seen_as || bestPerNode[0]?.seen_as || items[0]?.seen_as || '';
+	}
+
+	var countryPart = (rawCountry || 'xx').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 2) || 'xx';
+	var maxNodeLen = Math.max(2, 13 - 7 - countryPart.length);
+	var nodePart = (rawNode || 'auto').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, maxNodeLen) || 'auto';
+	var prefix = 'warp_' + nodePart + '_' + countryPart + '_';
+
+	var existing = {};
+	for (var i = 0; i < (tunnels || []).length; i++) {
+		if (tunnels[i]?.iface) existing[tunnels[i].iface] = true;
+	}
+
+	var idx = 1;
+	while (existing[prefix + idx]) {
+		idx++;
+	}
+	var candidate = prefix + idx;
+	if (candidate.length > 15) {
+		var trimmedNode = nodePart.slice(0, Math.max(1, nodePart.length - (candidate.length - 15)));
+		candidate = 'warp_' + trimmedNode + '_' + countryPart + '_' + idx;
+	}
+	return candidate.slice(0, 15);
+}
+
 return view.extend({
 	load: function() {
 		return Promise.all([
@@ -250,6 +291,7 @@ return view.extend({
 		var bestEp = results?.best || '';
 		var bestPerNode = results?.best_per_node || [];
 		var queryNode = getQueryParam('node').toUpperCase();
+		var defaultIface = buildDefaultIfaceName(tunnels, results, queryNode);
 
 		var viewRoot = E('div', { 'class': 'cbi-map' }, [
 			E('h2', {}, _('WarpScout - WireGuard & AmneziaWG Tunnels')),
@@ -402,7 +444,7 @@ return view.extend({
 							'type': 'text',
 							'id': 'new-iface',
 							'class': 'cbi-input-text',
-							'value': 'wsawg0',
+							'value': defaultIface,
 							'maxlength': '15'
 						}))
 					]),

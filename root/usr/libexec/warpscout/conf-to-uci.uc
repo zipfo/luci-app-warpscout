@@ -91,7 +91,7 @@ function apply_tunnel(opts) {
 		return { success: false, error: 'Invalid configuration format: PrivateKey or PublicKey missing' };
 	}
 
-	const iface = opts.iface || (opts.proto == 'wireguard' ? 'wswg0' : 'wsawg0');
+	const iface = opts.iface || 'warp_auto_xx_1';
 	if (!match(iface, /^[a-zA-Z0-9_-]{1,15}$/)) {
 		return { success: false, error: 'Invalid interface name: must be 1-15 alphanumeric chars' };
 	}

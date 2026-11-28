@@ -804,7 +804,6 @@ const methods = {
 
 			const p = req.args || {};
 			const proto = p.proto || 'amneziawg';
-			const iface = p.iface || (proto == 'wireguard' ? 'wswg0' : 'wsawg0');
 
 			// Capability Gate
 			const caps = command('/usr/libexec/warpscout/capabilities.sh 2>/dev/null');
@@ -853,6 +852,23 @@ const methods = {
 						break;
 					}
 				}
+			}
+
+			let iface = p.iface;
+			if (!iface || !length(iface)) {
+				let raw_node = last_node || state?.last_scan?.best_node || 'auto';
+				let raw_country = last_seen_as || state?.last_scan?.best_seen_as || 'xx';
+				let country_part = substr(replace(lc(raw_country), /[^a-z0-9]/g, ''), 0, 2) || 'xx';
+				let max_node_len = 13 - 7 - length(country_part);
+				if (max_node_len < 2) max_node_len = 2;
+				let node_part = substr(replace(lc(raw_node), /[^a-z0-9]/g, ''), 0, max_node_len) || 'auto';
+				let prefix = `warp_${node_part}_${country_part}_`;
+				const net_uci = cursor();
+				let idx = 1;
+				while (net_uci.get('network', `${prefix}${idx}`)) {
+					idx++;
+				}
+				iface = substr(`${prefix}${idx}`, 0, 15);
 			}
 
 			const apply_res = engine.apply_tunnel({
