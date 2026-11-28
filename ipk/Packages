@@ -1,5 +1,5 @@
 Package: luci-app-warpscout
-Version: 0.1.1-r1
+Version: 0.1.2-r1
 Depends: libc, luci-base, ucode, ucode-mod-uci, ucode-mod-fs, rpcd-mod-ucode, jsonfilter
 Source: feeds/base/luci-app-warpscout
 SourceName: luci-app-warpscout
@@ -9,14 +9,14 @@ SourceDateEpoch: 1738624177
 URL: https://github.com/openwrt/luci
 Maintainer: OpenWrt LuCI community
 Architecture: all
-Installed-Size: 194560
-Filename: /out/luci-app-warpscout_0.1.1-r1_all.ipk
-Size: 42224
-SHA256sum: dbea11776d4f5f831eaccdeb3b357d252ee27b50651c30dd55ff7b4eec88031c
+Installed-Size: 215040
+Filename: /out/luci-app-warpscout_0.1.2-r1_all.ipk
+Size: 46202
+SHA256sum: 17a6e1ab3f6766639d1f43e86deac123af1b645b9bc7a66236054f6673207559
 Description:  LuCI support for warpscout Cloudflare WARP scanner and wrapper
 
 Package: luci-i18n-warpscout-ru
-Version: 0.261127.48003
+Version: 0.261128.30566
 Depends: libc, luci-app-warpscout
 Source: feeds/base/luci-app-warpscout
 SourceName: luci-app-warpscout
@@ -26,8 +26,8 @@ SourceDateEpoch: 1738624177
 Maintainer: WarpScout Team
 Architecture: all
 Installed-Size: 40960
-Filename: /out/luci-i18n-warpscout-ru_0.261127.48003_all.ipk
-Size: 12809
-SHA256sum: 9c7a67ee788c997b6228177c61de9d5760936880295d279dd4561d8d655e8f1b
+Filename: /out/luci-i18n-warpscout-ru_0.261128.30566_all.ipk
+Size: 13074
+SHA256sum: b59a2194199d2f223058581fc6dea8e99501e442231758e956d52ae7b40507e0
 Description:  Translation for luci-app-warpscout - Русский (Russian)
 
