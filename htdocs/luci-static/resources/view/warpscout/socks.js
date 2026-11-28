@@ -16,7 +16,11 @@ var callGetSocksStatus = rpc.declare({
 var callSetSocksConfig = rpc.declare({
 	object: 'luci.warpscout',
 	method: 'setSocksConfig',
-	params: [ 'enabled', 'endpoint', 'proto', 'listen', 'port', 'allow_lan' ],
+	params: [
+		'enabled', 'endpoint', 'proto', 'listen', 'port', 'allow_lan',
+		'padding', 'rekey_after', 'rekey_timeout', 'reject_after',
+		'keepalive_timeout', 'max_handshakes', 'disable_cookies', 'random_trailers'
+	],
 	expect: { }
 });
 
@@ -39,6 +43,14 @@ return view.extend({
 		var port = parseInt(document.getElementById('socks-port').value, 10) || 1080;
 		var allowLan = document.getElementById('socks-allow-lan').checked;
 		var listen = allowLan ? '0.0.0.0' : '127.0.0.1';
+		var padding = (document.getElementById('socks-padding')?.value || '').trim();
+		var rekeyAfter = (document.getElementById('socks-rekey-after')?.value || '').trim();
+		var rekeyTimeout = (document.getElementById('socks-rekey-timeout')?.value || '').trim();
+		var rejectAfter = (document.getElementById('socks-reject-after')?.value || '').trim();
+		var keepaliveTimeout = (document.getElementById('socks-keepalive-timeout')?.value || '').trim();
+		var maxHandshakes = (document.getElementById('socks-max-handshakes')?.value || '').trim();
+		var disableCookies = !!document.getElementById('socks-disable-cookies')?.checked;
+		var randomTrailers = !!document.getElementById('socks-random-trailers')?.checked;
 
 		if (enabled && !endpoint) {
 			ui.addNotification(null, E('p', _('Please specify a target WARP endpoint before enabling the SOCKS proxy.')), 'error');
@@ -49,7 +61,11 @@ return view.extend({
 			E('p', { 'class': 'spinning' }, _('Updating UCI settings and controlling warpscout-socks service...'))
 		]);
 
-		return callSetSocksConfig(enabled, endpoint, proto, listen, port, allowLan).then(function(res) {
+		return callSetSocksConfig(
+			enabled, endpoint, proto, listen, port, allowLan,
+			padding, rekeyAfter, rekeyTimeout, rejectAfter,
+			keepaliveTimeout, maxHandshakes, disableCookies, randomTrailers
+		).then(function(res) {
 			ui.hideModal();
 			if (res && res.success) {
 				ui.addNotification(null, E('p', _('SOCKS proxy configuration updated successfully.')), 'info');
@@ -213,6 +229,7 @@ return view.extend({
 		// Protocol Row
 		var protoChoices = {
 			'awg': _('AmneziaWG (awg) - Anti-DPI Obfuscation (Recommended)'),
+			'awg31': _('AmneziaWG 3.1 (awg31) - Advanced Anti-DPI'),
 			'wg': _('WireGuard (wg) - Standard UDP'),
 			'masque': _('MASQUE (masque) - CONNECT-IP over QUIC'),
 			'masque-h2': _('MASQUE-H2 (masque-h2) - CONNECT-IP over HTTP/2 TCP')
@@ -223,6 +240,13 @@ return view.extend({
 			optional: false
 		}).render();
 
+		protoSelect.addEventListener('cbi-dropdown-change', function() {
+			var show = (protoSelect.value === 'awg31');
+			formTable.querySelectorAll('.socks-awg31-row').forEach(function(el) {
+				el.style.display = show ? '' : 'none';
+			});
+		});
+
 		var protoRow = E('div', { 'class': 'cbi-value' }, [
 			E('label', { 'class': 'cbi-value-title', 'for': 'socks-proto' }, _('Tunnel Protocol')),
 			E('div', { 'class': 'cbi-value-field' }, [
@@ -231,6 +255,47 @@ return view.extend({
 			])
 		]);
 		formTable.appendChild(protoRow);
+
+		var isAwg31 = (s.proto === 'awg31');
+		var awg31Style = 'display:' + (isAwg31 ? '' : 'none') + ';';
+
+		formTable.appendChild(E('div', { 'class': 'cbi-value socks-awg31-row', 'style': awg31Style }, [
+			E('label', { 'class': 'cbi-value-title', 'for': 'socks-padding' }, _('AWG 3.1 Data Padding (-padding)')),
+			E('div', { 'class': 'cbi-value-field' }, [
+				E('input', { 'type': 'text', 'id': 'socks-padding', 'class': 'cbi-input-text', 'style': 'max-width:220px;', 'value': s.padding || '', 'placeholder': 'N or MIN-MAX (e.g. 16-64)' })
+			])
+		]));
+
+		formTable.appendChild(E('div', { 'class': 'cbi-value socks-awg31-row', 'style': awg31Style }, [
+			E('label', { 'class': 'cbi-value-title' }, _('AWG 3.1 Timing: Rekey After / Timeout / Reject')),
+			E('div', { 'class': 'cbi-value-field' }, [
+				E('input', { 'type': 'text', 'id': 'socks-rekey-after', 'class': 'cbi-input-text', 'style': 'width:100px;display:inline-block;margin-right:6px;', 'value': s.rekey_after || '', 'placeholder': 'rekey-after' }),
+				E('input', { 'type': 'text', 'id': 'socks-rekey-timeout', 'class': 'cbi-input-text', 'style': 'width:100px;display:inline-block;margin-right:6px;', 'value': s.rekey_timeout || '', 'placeholder': 'rekey-timeout' }),
+				E('input', { 'type': 'text', 'id': 'socks-reject-after', 'class': 'cbi-input-text', 'style': 'width:100px;display:inline-block;', 'value': s.reject_after || '', 'placeholder': 'reject-after' })
+			])
+		]));
+
+		formTable.appendChild(E('div', { 'class': 'cbi-value socks-awg31-row', 'style': awg31Style }, [
+			E('label', { 'class': 'cbi-value-title' }, _('AWG 3.1 Keepalive Timeout / Max Handshakes')),
+			E('div', { 'class': 'cbi-value-field' }, [
+				E('input', { 'type': 'text', 'id': 'socks-keepalive-timeout', 'class': 'cbi-input-text', 'style': 'width:130px;display:inline-block;margin-right:6px;', 'value': s.keepalive_timeout || '', 'placeholder': 'keepalive-timeout' }),
+				E('input', { 'type': 'text', 'id': 'socks-max-handshakes', 'class': 'cbi-input-text', 'style': 'width:130px;display:inline-block;', 'value': s.max_handshakes || '', 'placeholder': 'max-handshakes' })
+			])
+		]));
+
+		formTable.appendChild(E('div', { 'class': 'cbi-value socks-awg31-row', 'style': awg31Style }, [
+			E('label', { 'class': 'cbi-value-title' }, _('AWG 3.1 Flags (-disable-cookies / -random-trailers)')),
+			E('div', { 'class': 'cbi-value-field' }, [
+				E('label', { 'style': 'margin-right:16px;' }, [
+					E('input', { 'type': 'checkbox', 'id': 'socks-disable-cookies', 'class': 'cbi-input-checkbox', 'checked': s.disable_cookies ? 'checked' : null }), ' ',
+					_('Disable Cookies')
+				]),
+				E('label', {}, [
+					E('input', { 'type': 'checkbox', 'id': 'socks-random-trailers', 'class': 'cbi-input-checkbox', 'checked': s.random_trailers ? 'checked' : null }), ' ',
+					_('Random Trailers')
+				])
+			])
+		]));
 
 		// Allow LAN Access Row
 		var lanWarning = E('div', {

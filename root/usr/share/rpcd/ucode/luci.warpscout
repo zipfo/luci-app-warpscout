@@ -295,6 +295,14 @@ const methods = {
 			jmin: 0,
 			jmax: 0,
 			i1: '',
+			padding: '',
+			rekey_after: '',
+			rekey_timeout: '',
+			reject_after: '',
+			keepalive_timeout: '',
+			max_handshakes: '',
+			disable_cookies: false,
+			random_trailers: false,
 			masque_sni: '',
 			masque_attempts: 0
 		},
@@ -368,7 +376,7 @@ const methods = {
 			}
 
 			// Protocol-specific flags
-			if (proto == 'awg') {
+			if (proto == 'awg' || proto == 'awg31') {
 				if (p.gen_junk) push(flags, '--gen-junk');
 				if (p.gen_i1 && length(p.gen_i1)) push(flags, `--gen-i1 ${shellquote(p.gen_i1)}`);
 				if (p.i1_sni && length(trim(p.i1_sni))) push(flags, `--i1-sni ${shellquote(trim(p.i1_sni))}`);
@@ -376,6 +384,22 @@ const methods = {
 				if (p.jmin && int(p.jmin) > 0) push(flags, `--jmin ${int(p.jmin)}`);
 				if (p.jmax && int(p.jmax) > 0) push(flags, `--jmax ${int(p.jmax)}`);
 				if (p.i1 && length(trim(p.i1))) push(flags, `--i1 ${shellquote(trim(p.i1))}`);
+				if (proto == 'awg31') {
+					const awg31_ranges = [
+						[ 'padding', '-padding' ],
+						[ 'rekey_after', '-rekey-after' ],
+						[ 'rekey_timeout', '-rekey-timeout' ],
+						[ 'reject_after', '-reject-after' ],
+						[ 'keepalive_timeout', '-keepalive-timeout' ],
+						[ 'max_handshakes', '-max-handshakes' ]
+					];
+					for (let pair in awg31_ranges) {
+						let val = trim('' + (p[pair[0]] || ''));
+						if (length(val)) push(flags, `${pair[1]} ${shellquote(val)}`);
+					}
+					if (p.disable_cookies) push(flags, '-disable-cookies');
+					if (p.random_trailers) push(flags, '-random-trailers');
+				}
 			} else if (proto == 'masque' || proto == 'masque-h2') {
 				if (p.masque_sni && length(trim(p.masque_sni))) push(flags, `--masque-sni ${shellquote(trim(p.masque_sni))}`);
 				if (p.masque_attempts && int(p.masque_attempts) > 0) push(flags, `--masque-attempts ${int(p.masque_attempts)}`);
@@ -425,6 +449,14 @@ const methods = {
 					jmin: s.jmin ? int(s.jmin) : null,
 					jmax: s.jmax ? int(s.jmax) : null,
 					i1: s.i1 || '',
+					padding: s.padding || '',
+					rekey_after: s.rekey_after || '',
+					rekey_timeout: s.rekey_timeout || '',
+					reject_after: s.reject_after || '',
+					keepalive_timeout: s.keepalive_timeout || '',
+					max_handshakes: s.max_handshakes || '',
+					disable_cookies: (s.disable_cookies == '1'),
+					random_trailers: (s.random_trailers == '1'),
 					masque_sni: s.masque_sni || '',
 					masque_attempts: s.masque_attempts ? int(s.masque_attempts) : null
 				});
@@ -459,6 +491,14 @@ const methods = {
 			jmin: 0,
 			jmax: 0,
 			i1: '',
+			padding: '',
+			rekey_after: '',
+			rekey_timeout: '',
+			reject_after: '',
+			keepalive_timeout: '',
+			max_handshakes: '',
+			disable_cookies: false,
+			random_trailers: false,
 			masque_sni: '',
 			masque_attempts: 0
 		},
@@ -496,6 +536,14 @@ const methods = {
 			uci.set('warpscout', name, 'jmin', (p.jmin && int(p.jmin) > 0) ? ('' + int(p.jmin)) : '');
 			uci.set('warpscout', name, 'jmax', (p.jmax && int(p.jmax) > 0) ? ('' + int(p.jmax)) : '');
 			uci.set('warpscout', name, 'i1', p.i1 || '');
+			uci.set('warpscout', name, 'padding', trim('' + (p.padding || '')));
+			uci.set('warpscout', name, 'rekey_after', trim('' + (p.rekey_after || '')));
+			uci.set('warpscout', name, 'rekey_timeout', trim('' + (p.rekey_timeout || '')));
+			uci.set('warpscout', name, 'reject_after', trim('' + (p.reject_after || '')));
+			uci.set('warpscout', name, 'keepalive_timeout', trim('' + (p.keepalive_timeout || '')));
+			uci.set('warpscout', name, 'max_handshakes', trim('' + (p.max_handshakes || '')));
+			uci.set('warpscout', name, 'disable_cookies', p.disable_cookies ? '1' : '0');
+			uci.set('warpscout', name, 'random_trailers', p.random_trailers ? '1' : '0');
 			uci.set('warpscout', name, 'masque_sni', p.masque_sni || '');
 			uci.set('warpscout', name, 'masque_attempts', (p.masque_attempts && int(p.masque_attempts) > 0) ? ('' + int(p.masque_attempts)) : '');
 
@@ -1074,6 +1122,14 @@ const methods = {
 			const listen = uci.get('warpscout', 'socks', 'listen') || '127.0.0.1';
 			const port = uci.get('warpscout', 'socks', 'port') || '1080';
 			const allow_lan = (uci.get('warpscout', 'socks', 'allow_lan') == '1');
+			const padding = uci.get('warpscout', 'socks', 'padding') || '';
+			const rekey_after = uci.get('warpscout', 'socks', 'rekey_after') || '';
+			const rekey_timeout = uci.get('warpscout', 'socks', 'rekey_timeout') || '';
+			const reject_after = uci.get('warpscout', 'socks', 'reject_after') || '';
+			const keepalive_timeout = uci.get('warpscout', 'socks', 'keepalive_timeout') || '';
+			const max_handshakes = uci.get('warpscout', 'socks', 'max_handshakes') || '';
+			const disable_cookies = (uci.get('warpscout', 'socks', 'disable_cookies') == '1');
+			const random_trailers = (uci.get('warpscout', 'socks', 'random_trailers') == '1');
 			uci.unload('warpscout');
 
 			// Check process status
@@ -1130,6 +1186,14 @@ const methods = {
 				listen: listen,
 				port: port,
 				allow_lan: allow_lan,
+				padding: padding,
+				rekey_after: rekey_after,
+				rekey_timeout: rekey_timeout,
+				reject_after: reject_after,
+				keepalive_timeout: keepalive_timeout,
+				max_handshakes: max_handshakes,
+				disable_cookies: disable_cookies,
+				random_trailers: random_trailers,
 				running: running,
 				pid: pid,
 				listening: listening,
@@ -1147,7 +1211,15 @@ const methods = {
 			proto: '',
 			listen: '',
 			port: 0,
-			allow_lan: false
+			allow_lan: false,
+			padding: '',
+			rekey_after: '',
+			rekey_timeout: '',
+			reject_after: '',
+			keepalive_timeout: '',
+			max_handshakes: '',
+			disable_cookies: false,
+			random_trailers: false
 		},
 		call: function(req) {
 			const p = req.args || {};
@@ -1170,6 +1242,14 @@ const methods = {
 
 			const port = '' + (p.port || '1080');
 			uci.set('warpscout', 'socks', 'port', port);
+			uci.set('warpscout', 'socks', 'padding', trim('' + (p.padding || '')));
+			uci.set('warpscout', 'socks', 'rekey_after', trim('' + (p.rekey_after || '')));
+			uci.set('warpscout', 'socks', 'rekey_timeout', trim('' + (p.rekey_timeout || '')));
+			uci.set('warpscout', 'socks', 'reject_after', trim('' + (p.reject_after || '')));
+			uci.set('warpscout', 'socks', 'keepalive_timeout', trim('' + (p.keepalive_timeout || '')));
+			uci.set('warpscout', 'socks', 'max_handshakes', trim('' + (p.max_handshakes || '')));
+			uci.set('warpscout', 'socks', 'disable_cookies', p.disable_cookies ? '1' : '0');
+			uci.set('warpscout', 'socks', 'random_trailers', p.random_trailers ? '1' : '0');
 
 			uci.commit('warpscout');
 

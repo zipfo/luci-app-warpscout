@@ -1266,3 +1266,25 @@ msgstr "Статус версий"
 msgid "warpscout Binary"
 msgstr "Бинарник warpscout"
 
+msgid "AWG 3.1 Data Padding (-padding)"
+msgstr "Дополнение данных AWG 3.1 (-padding)"
+
+msgid "AWG 3.1 Flags (-disable-cookies / -random-trailers)"
+msgstr "Флаги AWG 3.1 (-disable-cookies / -random-trailers)"
+
+msgid "AWG 3.1 Keepalive Timeout / Max Handshakes"
+msgstr "AWG 3.1: Keepalive Timeout / Max Handshakes"
+
+msgid "AWG 3.1 Timing: Rekey After / Timeout / Reject"
+msgstr "Тайминги AWG 3.1: Rekey After / Timeout / Reject"
+
+msgid "AmneziaWG 3.1 (awg31) - Advanced Anti-DPI"
+msgstr "AmneziaWG 3.1 (awg31) — расширенная анти-DPI обфускация"
+
+msgid "Disable Cookies"
+msgstr "Отключить Cookies"
+
+msgid "Random Trailers"
+msgstr "Случайные хвосты (Random Trailers)"
+
+

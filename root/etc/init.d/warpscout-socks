@@ -51,7 +51,7 @@ start_service() {
 		-a "$account"
 
 	# Check AmneziaWG / MASQUE parameters when applicable
-	if [ "$proto" = "awg" ]; then
+	if [ "$proto" = "awg" ] || [ "$proto" = "awg31" ]; then
 		local jc jmin jmax i1 gen_junk gen_i1 i1_sni
 		config_get jc socks jc ''
 		config_get jmin socks jmin ''
@@ -76,6 +76,36 @@ start_service() {
 		[ -n "$jmin" ] && procd_append_param command -jmin "$jmin"
 		[ -n "$jmax" ] && procd_append_param command -jmax "$jmax"
 		[ -n "$i1" ] && procd_append_param command -i1 "$i1"
+
+		if [ "$proto" = "awg31" ]; then
+			local padding rekey_after rekey_timeout reject_after keepalive_timeout max_handshakes disable_cookies random_trailers
+			config_get padding socks padding ''
+			config_get rekey_after socks rekey_after ''
+			config_get rekey_timeout socks rekey_timeout ''
+			config_get reject_after socks reject_after ''
+			config_get keepalive_timeout socks keepalive_timeout ''
+			config_get max_handshakes socks max_handshakes ''
+			config_get_bool disable_cookies socks disable_cookies 0
+			config_get_bool random_trailers socks random_trailers 0
+
+			[ -z "$padding" ] && config_get padding default padding ''
+			[ -z "$rekey_after" ] && config_get rekey_after default rekey_after ''
+			[ -z "$rekey_timeout" ] && config_get rekey_timeout default rekey_timeout ''
+			[ -z "$reject_after" ] && config_get reject_after default reject_after ''
+			[ -z "$keepalive_timeout" ] && config_get keepalive_timeout default keepalive_timeout ''
+			[ -z "$max_handshakes" ] && config_get max_handshakes default max_handshakes ''
+			[ "$disable_cookies" -eq 0 ] && config_get_bool disable_cookies default disable_cookies 0
+			[ "$random_trailers" -eq 0 ] && config_get_bool random_trailers default random_trailers 0
+
+			[ -n "$padding" ] && procd_append_param command -padding "$padding"
+			[ -n "$rekey_after" ] && procd_append_param command -rekey-after "$rekey_after"
+			[ -n "$rekey_timeout" ] && procd_append_param command -rekey-timeout "$rekey_timeout"
+			[ -n "$reject_after" ] && procd_append_param command -reject-after "$reject_after"
+			[ -n "$keepalive_timeout" ] && procd_append_param command -keepalive-timeout "$keepalive_timeout"
+			[ -n "$max_handshakes" ] && procd_append_param command -max-handshakes "$max_handshakes"
+			[ "$disable_cookies" -eq 1 ] && procd_append_param command -disable-cookies
+			[ "$random_trailers" -eq 1 ] && procd_append_param command -random-trailers
+		fi
 	elif [ "$proto" = "masque" ] || [ "$proto" = "masque-h2" ]; then
 		local masque_sni masque_attempts
 		config_get masque_sni socks masque_sni ''

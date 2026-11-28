@@ -105,7 +105,7 @@ elif [ "$1" = "--cron" ]; then
 	for c in $EXCLUDE_COUNTRIES; do CRON_FLAGS="$CRON_FLAGS --exclude-country $c"; done
 	[ -n "$TARGETS" ] && CRON_FLAGS="$CRON_FLAGS --target $TARGETS"
 
-	if [ "$PROTO" = "awg" ]; then
+	if [ "$PROTO" = "awg" ] || [ "$PROTO" = "awg31" ]; then
 		GEN_JUNK=$(uci -q get "warpscout.${PROFILE}.gen_junk" || echo "0")
 		GEN_I1=$(uci -q get "warpscout.${PROFILE}.gen_i1" || echo "")
 		I1_SNI=$(uci -q get "warpscout.${PROFILE}.i1_sni" || echo "")
@@ -120,6 +120,25 @@ elif [ "$1" = "--cron" ]; then
 		[ -n "$JMIN" ] && CRON_FLAGS="$CRON_FLAGS --jmin $JMIN"
 		[ -n "$JMAX" ] && CRON_FLAGS="$CRON_FLAGS --jmax $JMAX"
 		[ -n "$I1" ] && CRON_FLAGS="$CRON_FLAGS --i1 $I1"
+
+		if [ "$PROTO" = "awg31" ]; then
+			PADDING=$(uci -q get "warpscout.${PROFILE}.padding" || echo "")
+			REKEY_AFTER=$(uci -q get "warpscout.${PROFILE}.rekey_after" || echo "")
+			REKEY_TIMEOUT=$(uci -q get "warpscout.${PROFILE}.rekey_timeout" || echo "")
+			REJECT_AFTER=$(uci -q get "warpscout.${PROFILE}.reject_after" || echo "")
+			KEEPALIVE_TIMEOUT=$(uci -q get "warpscout.${PROFILE}.keepalive_timeout" || echo "")
+			MAX_HANDSHAKES=$(uci -q get "warpscout.${PROFILE}.max_handshakes" || echo "")
+			DISABLE_COOKIES=$(uci -q get "warpscout.${PROFILE}.disable_cookies" || echo "0")
+			RANDOM_TRAILERS=$(uci -q get "warpscout.${PROFILE}.random_trailers" || echo "0")
+			[ -n "$PADDING" ] && CRON_FLAGS="$CRON_FLAGS -padding $PADDING"
+			[ -n "$REKEY_AFTER" ] && CRON_FLAGS="$CRON_FLAGS -rekey-after $REKEY_AFTER"
+			[ -n "$REKEY_TIMEOUT" ] && CRON_FLAGS="$CRON_FLAGS -rekey-timeout $REKEY_TIMEOUT"
+			[ -n "$REJECT_AFTER" ] && CRON_FLAGS="$CRON_FLAGS -reject-after $REJECT_AFTER"
+			[ -n "$KEEPALIVE_TIMEOUT" ] && CRON_FLAGS="$CRON_FLAGS -keepalive-timeout $KEEPALIVE_TIMEOUT"
+			[ -n "$MAX_HANDSHAKES" ] && CRON_FLAGS="$CRON_FLAGS -max-handshakes $MAX_HANDSHAKES"
+			[ "$DISABLE_COOKIES" = "1" ] && CRON_FLAGS="$CRON_FLAGS -disable-cookies"
+			[ "$RANDOM_TRAILERS" = "1" ] && CRON_FLAGS="$CRON_FLAGS -random-trailers"
+		fi
 	elif [ "$PROTO" = "masque" ] || [ "$PROTO" = "masque-h2" ]; then
 		MASQUE_SNI=$(uci -q get "warpscout.${PROFILE}.masque_sni" || echo "")
 		MASQUE_ATTEMPTS=$(uci -q get "warpscout.${PROFILE}.masque_attempts" || echo "")

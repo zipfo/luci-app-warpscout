@@ -1098,4 +1098,26 @@ msgstr ""
 msgid "warpscout Binary"
 msgstr ""
 
+msgid "AWG 3.1 Data Padding (-padding)"
+msgstr ""
+
+msgid "AWG 3.1 Flags (-disable-cookies / -random-trailers)"
+msgstr ""
+
+msgid "AWG 3.1 Keepalive Timeout / Max Handshakes"
+msgstr ""
+
+msgid "AWG 3.1 Timing: Rekey After / Timeout / Reject"
+msgstr ""
+
+msgid "AmneziaWG 3.1 (awg31) - Advanced Anti-DPI"
+msgstr ""
+
+msgid "Disable Cookies"
+msgstr ""
+
+msgid "Random Trailers"
+msgstr ""
+
+
 

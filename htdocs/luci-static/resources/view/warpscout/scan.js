@@ -12,7 +12,10 @@ var SCAN_PARAMS = [
 	'proto', 'tun_ping', 'speed', 'best_by', 'sample', 'full', 'timeout',
 	'ipv6', 'port', 'sweep_ports', 'nodes', 'countries', 'exclude_nodes',
 	'exclude_countries', 'targets', 'gen_i1', 'i1_sni', 'gen_junk',
-	'jc', 'jmin', 'jmax', 'i1', 'masque_sni', 'masque_attempts'
+	'jc', 'jmin', 'jmax', 'i1',
+	'padding', 'rekey_after', 'rekey_timeout', 'reject_after',
+	'keepalive_timeout', 'max_handshakes', 'disable_cookies', 'random_trailers',
+	'masque_sni', 'masque_attempts'
 ];
 
 var callStartScan = rpc.declare({
@@ -87,6 +90,15 @@ return view.extend({
 		var jmax = parseInt(document.getElementById('field-jmax').value, 10) || 0;
 		var i1 = document.getElementById('field-i1').value.trim();
 
+		var padding = document.getElementById('field-padding').value.trim();
+		var rekeyAfter = document.getElementById('field-rekey-after').value.trim();
+		var rekeyTimeout = document.getElementById('field-rekey-timeout').value.trim();
+		var rejectAfter = document.getElementById('field-reject-after').value.trim();
+		var keepaliveTimeout = document.getElementById('field-keepalive-timeout').value.trim();
+		var maxHandshakes = document.getElementById('field-max-handshakes').value.trim();
+		var disableCookies = document.getElementById('field-disable-cookies').checked;
+		var randomTrailers = document.getElementById('field-random-trailers').checked;
+
 		var masqueSni = document.getElementById('field-masque-sni').value.trim();
 		var masqueAttempts = parseInt(document.getElementById('field-masque-attempts').value, 10) || 0;
 
@@ -113,6 +125,14 @@ return view.extend({
 			jmin: jmin,
 			jmax: jmax,
 			i1: i1,
+			padding: padding,
+			rekey_after: rekeyAfter,
+			rekey_timeout: rekeyTimeout,
+			reject_after: rejectAfter,
+			keepalive_timeout: keepaliveTimeout,
+			max_handshakes: maxHandshakes,
+			disable_cookies: disableCookies,
+			random_trailers: randomTrailers,
 			masque_sni: masqueSni,
 			masque_attempts: masqueAttempts
 		};
@@ -144,6 +164,15 @@ return view.extend({
 		document.getElementById('field-jmax').value = p.jmax || '';
 		document.getElementById('field-i1').value = p.i1 || '';
 
+		document.getElementById('field-padding').value = p.padding || '';
+		document.getElementById('field-rekey-after').value = p.rekey_after || '';
+		document.getElementById('field-rekey-timeout').value = p.rekey_timeout || '';
+		document.getElementById('field-reject-after').value = p.reject_after || '';
+		document.getElementById('field-keepalive-timeout').value = p.keepalive_timeout || '';
+		document.getElementById('field-max-handshakes').value = p.max_handshakes || '';
+		document.getElementById('field-disable-cookies').checked = !!p.disable_cookies;
+		document.getElementById('field-random-trailers').checked = !!p.random_trailers;
+
 		document.getElementById('field-masque-sni').value = p.masque_sni || '';
 		document.getElementById('field-masque-attempts').value = p.masque_attempts || '';
 
@@ -155,11 +184,15 @@ return view.extend({
 		var speed = document.getElementById('field-speed')?.checked || false;
 		var full = document.getElementById('field-full')?.checked || false;
 
-		var isAwg = (proto === 'awg');
+		var isAwg = (proto === 'awg' || proto === 'awg31');
+		var isAwg31 = (proto === 'awg31');
 		var isMasque = (proto === 'masque' || proto === 'masque-h2');
 
 		document.querySelectorAll('.awg-only-row').forEach(function(el) {
 			el.style.display = isAwg ? '' : 'none';
+		});
+		document.querySelectorAll('.awg31-only-row').forEach(function(el) {
+			el.style.display = isAwg31 ? '' : 'none';
 		});
 		document.querySelectorAll('.masque-only-row').forEach(function(el) {
 			el.style.display = isMasque ? '' : 'none';
@@ -216,7 +249,10 @@ return view.extend({
 			v.proto, v.tun_ping, v.speed, v.best_by, v.sample, v.full, v.timeout,
 			v.ipv6, v.port, v.sweep_ports, v.nodes, v.countries, v.exclude_nodes,
 			v.exclude_countries, v.targets, v.gen_i1, v.i1_sni, v.gen_junk,
-			v.jc, v.jmin, v.jmax, v.i1, v.masque_sni, v.masque_attempts
+			v.jc, v.jmin, v.jmax, v.i1,
+			v.padding, v.rekey_after, v.rekey_timeout, v.reject_after,
+			v.keepalive_timeout, v.max_handshakes, v.disable_cookies, v.random_trailers,
+			v.masque_sni, v.masque_attempts
 		).then(function(res) {
 			ui.hideModal();
 			if (res && res.success) {
@@ -237,7 +273,10 @@ return view.extend({
 			v.proto, v.tun_ping, v.speed, v.best_by, v.sample, v.full, v.timeout,
 			v.ipv6, v.port, v.sweep_ports, v.nodes, v.countries, v.exclude_nodes,
 			v.exclude_countries, v.targets, v.gen_i1, v.i1_sni, v.gen_junk,
-			v.jc, v.jmin, v.jmax, v.i1, v.masque_sni, v.masque_attempts
+			v.jc, v.jmin, v.jmax, v.i1,
+			v.padding, v.rekey_after, v.rekey_timeout, v.reject_after,
+			v.keepalive_timeout, v.max_handshakes, v.disable_cookies, v.random_trailers,
+			v.masque_sni, v.masque_attempts
 		).then(function(res) {
 			if (res && res.success) {
 				ui.addNotification(null, E('p', _('Scan profile saved: ') + res.name), 'info');
@@ -360,6 +399,7 @@ return view.extend({
 
 		var protoSelect = new ui.Dropdown(defaultProf.proto || 'awg', {
 			'awg': 'AmneziaWG (awg) - Recommended',
+			'awg31': 'AmneziaWG 3.1 (awg31)',
 			'wg': 'WireGuard (wg)',
 			'masque': 'MASQUE HTTP/3 (masque)',
 			'masque-h2': 'MASQUE HTTP/2 (masque-h2)'
@@ -384,7 +424,8 @@ return view.extend({
 		});
 		fullCheckbox.addEventListener('change', function() { self.updateDependentVisibility(); });
 
-		var isAwgInit = (defaultProf.proto === 'awg');
+		var isAwgInit = (defaultProf.proto === 'awg' || defaultProf.proto === 'awg31');
+		var isAwg31Init = (defaultProf.proto === 'awg31');
 		var isMasqueInit = (defaultProf.proto === 'masque' || defaultProf.proto === 'masque-h2');
 
 		var viewRoot = E('div', { 'class': 'cbi-map' }, [
@@ -566,6 +607,40 @@ return view.extend({
 					E('tr', { 'class': 'tr awg-only-row', 'style': isAwgInit ? '' : 'display: none;' }, [
 						E('td', { 'class': 'td left' }, _('AWG Custom I1 Packet (--i1)')),
 						E('td', { 'class': 'td left' }, E('input', { 'type': 'text', 'id': 'field-i1', 'class': 'cbi-input-text', 'value': defaultProf.i1 || '', 'placeholder': 'CPS packet or "none"' }))
+					]),
+
+					// AWG 3.1-only rows
+					E('tr', { 'class': 'tr awg31-only-row', 'style': isAwg31Init ? '' : 'display: none;' }, [
+						E('td', { 'class': 'td left' }, _('AWG 3.1 Data Padding (-padding)')),
+						E('td', { 'class': 'td left' }, E('input', { 'type': 'text', 'id': 'field-padding', 'class': 'cbi-input-text', 'value': defaultProf.padding || '', 'placeholder': 'N or MIN-MAX (e.g. 16-64)' }))
+					]),
+					E('tr', { 'class': 'tr awg31-only-row', 'style': isAwg31Init ? '' : 'display: none;' }, [
+						E('td', { 'class': 'td left' }, _('AWG 3.1 Timing: Rekey After / Timeout / Reject')),
+						E('td', { 'class': 'td left' }, [
+							E('input', { 'type': 'text', 'id': 'field-rekey-after', 'style': 'width: 110px; display: inline-block;', 'class': 'cbi-input-text', 'value': defaultProf.rekey_after || '', 'placeholder': 'rekey-after' }), ' ',
+							E('input', { 'type': 'text', 'id': 'field-rekey-timeout', 'style': 'width: 110px; display: inline-block;', 'class': 'cbi-input-text', 'value': defaultProf.rekey_timeout || '', 'placeholder': 'rekey-timeout' }), ' ',
+							E('input', { 'type': 'text', 'id': 'field-reject-after', 'style': 'width: 110px; display: inline-block;', 'class': 'cbi-input-text', 'value': defaultProf.reject_after || '', 'placeholder': 'reject-after' })
+						])
+					]),
+					E('tr', { 'class': 'tr awg31-only-row', 'style': isAwg31Init ? '' : 'display: none;' }, [
+						E('td', { 'class': 'td left' }, _('AWG 3.1 Keepalive Timeout / Max Handshakes')),
+						E('td', { 'class': 'td left' }, [
+							E('input', { 'type': 'text', 'id': 'field-keepalive-timeout', 'style': 'width: 140px; display: inline-block;', 'class': 'cbi-input-text', 'value': defaultProf.keepalive_timeout || '', 'placeholder': 'keepalive-timeout' }), ' ',
+							E('input', { 'type': 'text', 'id': 'field-max-handshakes', 'style': 'width: 140px; display: inline-block;', 'class': 'cbi-input-text', 'value': defaultProf.max_handshakes || '', 'placeholder': 'max-handshakes' })
+						])
+					]),
+					E('tr', { 'class': 'tr awg31-only-row', 'style': isAwg31Init ? '' : 'display: none;' }, [
+						E('td', { 'class': 'td left' }, _('AWG 3.1 Flags (-disable-cookies / -random-trailers)')),
+						E('td', { 'class': 'td left' }, [
+							E('label', { 'style': 'margin-right: 16px;' }, [
+								E('input', { 'type': 'checkbox', 'id': 'field-disable-cookies', 'checked': defaultProf.disable_cookies ? 'checked' : null }), ' ',
+								_('Disable Cookies')
+							]),
+							E('label', {}, [
+								E('input', { 'type': 'checkbox', 'id': 'field-random-trailers', 'checked': defaultProf.random_trailers ? 'checked' : null }), ' ',
+								_('Random Trailers')
+							])
+						])
 					]),
 
 					// MASQUE-only rows
