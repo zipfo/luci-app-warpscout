@@ -1122,6 +1122,7 @@ const methods = {
 			const listen = uci.get('warpscout', 'socks', 'listen') || '127.0.0.1';
 			const port = uci.get('warpscout', 'socks', 'port') || '1080';
 			const allow_lan = (uci.get('warpscout', 'socks', 'allow_lan') == '1');
+			const gen_i1 = uci.get('warpscout', 'socks', 'gen_i1') || '';
 			const padding = uci.get('warpscout', 'socks', 'padding') || '';
 			const rekey_after = uci.get('warpscout', 'socks', 'rekey_after') || '';
 			const rekey_timeout = uci.get('warpscout', 'socks', 'rekey_timeout') || '';
@@ -1186,6 +1187,7 @@ const methods = {
 				listen: listen,
 				port: port,
 				allow_lan: allow_lan,
+				gen_i1: gen_i1,
 				padding: padding,
 				rekey_after: rekey_after,
 				rekey_timeout: rekey_timeout,
@@ -1212,6 +1214,7 @@ const methods = {
 			listen: '',
 			port: 0,
 			allow_lan: false,
+			gen_i1: '',
 			padding: '',
 			rekey_after: '',
 			rekey_timeout: '',
@@ -1242,6 +1245,7 @@ const methods = {
 
 			const port = '' + (p.port || '1080');
 			uci.set('warpscout', 'socks', 'port', port);
+			uci.set('warpscout', 'socks', 'gen_i1', trim('' + (p.gen_i1 || '')));
 			uci.set('warpscout', 'socks', 'padding', trim('' + (p.padding || '')));
 			uci.set('warpscout', 'socks', 'rekey_after', trim('' + (p.rekey_after || '')));
 			uci.set('warpscout', 'socks', 'rekey_timeout', trim('' + (p.rekey_timeout || '')));

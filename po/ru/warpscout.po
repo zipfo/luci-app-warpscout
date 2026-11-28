@@ -1269,6 +1269,9 @@ msgstr "Бинарник warpscout"
 msgid "AWG 3.1 Data Padding (-padding)"
 msgstr "Дополнение данных AWG 3.1 (-padding)"
 
+msgid "AWG Generate I1 (--gen-i1)"
+msgstr "Генерация I1 AWG (--gen-i1)"
+
 msgid "AWG 3.1 Flags (-disable-cookies / -random-trailers)"
 msgstr "Флаги AWG 3.1 (-disable-cookies / -random-trailers)"
 

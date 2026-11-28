@@ -18,11 +18,23 @@ var callSetSocksConfig = rpc.declare({
 	method: 'setSocksConfig',
 	params: [
 		'enabled', 'endpoint', 'proto', 'listen', 'port', 'allow_lan',
-		'padding', 'rekey_after', 'rekey_timeout', 'reject_after',
+		'gen_i1', 'padding', 'rekey_after', 'rekey_timeout', 'reject_after',
 		'keepalive_timeout', 'max_handshakes', 'disable_cookies', 'random_trailers'
 	],
 	expect: { }
 });
+
+var AWG31_DEFAULTS = {
+	gen_i1: 'quic',
+	padding: '24-80',
+	rekey_after: '90-120',
+	rekey_timeout: '3-7',
+	reject_after: '160-200',
+	keepalive_timeout: '8-15',
+	max_handshakes: '3-5',
+	disable_cookies: true,
+	random_trailers: true
+};
 
 var callTestSocksProxy = rpc.declare({
 	object: 'luci.warpscout',
@@ -43,6 +55,7 @@ return view.extend({
 		var port = parseInt(document.getElementById('socks-port').value, 10) || 1080;
 		var allowLan = document.getElementById('socks-allow-lan').checked;
 		var listen = allowLan ? '0.0.0.0' : '127.0.0.1';
+		var genI1 = document.getElementById('socks-gen-i1')?.value || '';
 		var padding = (document.getElementById('socks-padding')?.value || '').trim();
 		var rekeyAfter = (document.getElementById('socks-rekey-after')?.value || '').trim();
 		var rekeyTimeout = (document.getElementById('socks-rekey-timeout')?.value || '').trim();
@@ -63,7 +76,7 @@ return view.extend({
 
 		return callSetSocksConfig(
 			enabled, endpoint, proto, listen, port, allowLan,
-			padding, rekeyAfter, rekeyTimeout, rejectAfter,
+			genI1, padding, rekeyAfter, rekeyTimeout, rejectAfter,
 			keepaliveTimeout, maxHandshakes, disableCookies, randomTrailers
 		).then(function(res) {
 			ui.hideModal();
@@ -241,10 +254,38 @@ return view.extend({
 		}).render();
 
 		protoSelect.addEventListener('cbi-dropdown-change', function() {
-			var show = (protoSelect.value === 'awg31');
-			formTable.querySelectorAll('.socks-awg31-row').forEach(function(el) {
-				el.style.display = show ? '' : 'none';
+			var p = protoSelect.value;
+			var showAwg = (p === 'awg' || p === 'awg31');
+			var show31 = (p === 'awg31');
+			formTable.querySelectorAll('.socks-awg-row').forEach(function(el) {
+				el.style.display = showAwg ? '' : 'none';
 			});
+			formTable.querySelectorAll('.socks-awg31-row').forEach(function(el) {
+				el.style.display = show31 ? '' : 'none';
+			});
+			if (show31) {
+				var genEl = document.getElementById('socks-gen-i1');
+				if (genEl && !genEl.value) {
+					dom.callClassMethod(genEl, 'setValue', AWG31_DEFAULTS.gen_i1);
+				}
+				var allEmpty = [
+					'socks-padding', 'socks-rekey-after', 'socks-rekey-timeout',
+					'socks-reject-after', 'socks-keepalive-timeout', 'socks-max-handshakes'
+				].every(function(id) {
+					var el = document.getElementById(id);
+					return !el || !el.value.trim();
+				});
+				if (allEmpty) {
+					document.getElementById('socks-padding').value = AWG31_DEFAULTS.padding;
+					document.getElementById('socks-rekey-after').value = AWG31_DEFAULTS.rekey_after;
+					document.getElementById('socks-rekey-timeout').value = AWG31_DEFAULTS.rekey_timeout;
+					document.getElementById('socks-reject-after').value = AWG31_DEFAULTS.reject_after;
+					document.getElementById('socks-keepalive-timeout').value = AWG31_DEFAULTS.keepalive_timeout;
+					document.getElementById('socks-max-handshakes').value = AWG31_DEFAULTS.max_handshakes;
+					document.getElementById('socks-disable-cookies').checked = AWG31_DEFAULTS.disable_cookies;
+					document.getElementById('socks-random-trailers').checked = AWG31_DEFAULTS.random_trailers;
+				}
+			}
 		});
 
 		var protoRow = E('div', { 'class': 'cbi-value' }, [
@@ -256,8 +297,29 @@ return view.extend({
 		]);
 		formTable.appendChild(protoRow);
 
-		var isAwg31 = (s.proto === 'awg31');
+		var curProto = s.proto || 'awg';
+		var isAwg = (curProto === 'awg' || curProto === 'awg31');
+		var isAwg31 = (curProto === 'awg31');
+		var awgStyle = 'display:' + (isAwg ? '' : 'none') + ';';
 		var awg31Style = 'display:' + (isAwg31 ? '' : 'none') + ';';
+
+		formTable.appendChild(E('div', { 'class': 'cbi-value socks-awg-row', 'style': awgStyle }, [
+			E('label', { 'class': 'cbi-value-title', 'for': 'socks-gen-i1' }, _('AWG Generate I1 (--gen-i1)')),
+			E('div', { 'class': 'cbi-value-field' }, [
+				new ui.Dropdown(s.gen_i1 || '', {
+					'': _('Built-in iCloud probe'),
+					'quic': 'quic',
+					'dns': 'dns',
+					'sip': 'sip',
+					'stun': 'stun',
+					'random': 'random'
+				}, {
+					id: 'socks-gen-i1',
+					sort: false,
+					optional: false
+				}).render()
+			])
+		]));
 
 		formTable.appendChild(E('div', { 'class': 'cbi-value socks-awg31-row', 'style': awg31Style }, [
 			E('label', { 'class': 'cbi-value-title', 'for': 'socks-padding' }, _('AWG 3.1 Data Padding (-padding)')),

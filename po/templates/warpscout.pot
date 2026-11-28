@@ -1101,6 +1101,9 @@ msgstr ""
 msgid "AWG 3.1 Data Padding (-padding)"
 msgstr ""
 
+msgid "AWG Generate I1 (--gen-i1)"
+msgstr ""
+
 msgid "AWG 3.1 Flags (-disable-cookies / -random-trailers)"
 msgstr ""
 

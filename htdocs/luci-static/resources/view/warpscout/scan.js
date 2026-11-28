@@ -18,6 +18,18 @@ var SCAN_PARAMS = [
 	'masque_sni', 'masque_attempts'
 ];
 
+var AWG31_DEFAULTS = {
+	gen_i1: 'quic',
+	padding: '24-80',
+	rekey_after: '90-120',
+	rekey_timeout: '3-7',
+	reject_after: '160-200',
+	keepalive_timeout: '8-15',
+	max_handshakes: '3-5',
+	disable_cookies: true,
+	random_trailers: true
+};
+
 var callStartScan = rpc.declare({
 	object: 'luci.warpscout',
 	method: 'startScan',
@@ -206,6 +218,36 @@ return view.extend({
 		var sampleInput = document.getElementById('field-sample');
 		if (sampleInput) {
 			sampleInput.disabled = full;
+		}
+	},
+
+	prefillAwg31Defaults: function() {
+		var setIfEmpty = function(id, val) {
+			var el = document.getElementById(id);
+			if (el && !el.value.trim()) el.value = val;
+		};
+		var genI1El = document.getElementById('field-gen-i1');
+		if (genI1El && !genI1El.value) {
+			dom.callClassMethod(genI1El, 'setValue', AWG31_DEFAULTS.gen_i1);
+		}
+		var allEmpty = [
+			'field-padding', 'field-rekey-after', 'field-rekey-timeout',
+			'field-reject-after', 'field-keepalive-timeout', 'field-max-handshakes'
+		].every(function(id) {
+			var el = document.getElementById(id);
+			return !el || !el.value.trim();
+		});
+		if (allEmpty) {
+			setIfEmpty('field-padding', AWG31_DEFAULTS.padding);
+			setIfEmpty('field-rekey-after', AWG31_DEFAULTS.rekey_after);
+			setIfEmpty('field-rekey-timeout', AWG31_DEFAULTS.rekey_timeout);
+			setIfEmpty('field-reject-after', AWG31_DEFAULTS.reject_after);
+			setIfEmpty('field-keepalive-timeout', AWG31_DEFAULTS.keepalive_timeout);
+			setIfEmpty('field-max-handshakes', AWG31_DEFAULTS.max_handshakes);
+			var dc = document.getElementById('field-disable-cookies');
+			var rt = document.getElementById('field-random-trailers');
+			if (dc) dc.checked = AWG31_DEFAULTS.disable_cookies;
+			if (rt) rt.checked = AWG31_DEFAULTS.random_trailers;
 		}
 	},
 
@@ -408,7 +450,12 @@ return view.extend({
 			sort: false,
 			optional: false
 		}).render();
-		protoSelect.addEventListener('cbi-dropdown-change', function() { self.updateDependentVisibility(); });
+		protoSelect.addEventListener('cbi-dropdown-change', function() {
+			self.updateDependentVisibility();
+			if (protoSelect.value === 'awg31') {
+				self.prefillAwg31Defaults();
+			}
+		});
 
 		var speedCheckbox = E('input', {
 			'type': 'checkbox',
