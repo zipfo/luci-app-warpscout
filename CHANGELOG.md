@@ -2,6 +2,13 @@
 
 All notable changes to `luci-app-warpscout` will be documented in this file.
 
+## [0.1.2] - 2026-11-28
+
+### Added
+- **AmneziaWG 3.1 (`awg31`)**: Full support for `warpscout 0.17.0` `awg31` protocol and parameters (`padding`, `rekey_after`, `rekey_timeout`, `reject_after`, `keepalive_timeout`, `max_handshakes`, `disable_cookies`, `random_trailers`) across Scanner, Scan Profiles, Cron Runner, and SOCKS5 Proxy (`warpscout-socks` + UI).
+- **SOCKS5 `gen_i1` & Defaults**: Added `--gen-i1` selector for `awg`/`awg31` on the SOCKS Proxy tab and automatic prefill of tested `awg31` defaults when switching to `awg31`.
+- **Tunnel Naming**: Default created tunnel interface names now follow `warp_<node>_<country>_<index>` (e.g., `warp_arn_ru_1`) with automatic index increment and 15-character limit enforcement.
+
 ## [0.1.1] - 2026-11-27
 
 ### Changed

@@ -6,7 +6,7 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_VERSION:=0.1.1
+PKG_VERSION:=0.1.2
 PKG_RELEASE:=1
 
 LUCI_TITLE:=LuCI support for warpscout Cloudflare WARP scanner and wrapper
